@@ -388,18 +388,84 @@ func (ccs *CallChainService) calculateDegrees(graph *CallGraph) {
 
 // detectRecursiveCalls 检测递归调用
 func (ccs *CallChainService) detectRecursiveCalls(graph *CallGraph) {
+	// 直接递归：自环
 	for sourceID, edges := range graph.Edges {
 		for _, edge := range edges {
 			if edge.TargetID == sourceID {
-				// 直接递归
 				if node, exists := graph.Nodes[sourceID]; exists {
 					node.IsRecursive = true
 				}
 			}
 		}
 	}
-	
-	// TODO: 检测间接递归
+
+	// 间接递归：使用 Tarjan 算法检测强连通分量（SCC）
+	index := 0
+	indices := make(map[string]int)
+	lowlink := make(map[string]int)
+	onStack := make(map[string]bool)
+	stack := []string{}
+
+	var sccs [][]string
+
+	var strongConnect func(v string)
+	strongConnect = func(v string) {
+		indices[v] = index
+		lowlink[v] = index
+		index++
+		stack = append(stack, v)
+		onStack[v] = true
+
+		if edges, exists := graph.Edges[v]; exists {
+			for _, edge := range edges {
+				w := edge.TargetID
+				if _, seen := indices[w]; !seen {
+					strongConnect(w)
+					if lowlink[w] < lowlink[v] {
+						lowlink[v] = lowlink[w]
+					}
+				} else if onStack[w] && indices[w] < lowlink[v] {
+					lowlink[v] = indices[w]
+				}
+			}
+		}
+
+		if lowlink[v] == indices[v] {
+			// v 是一个 SCC 的根
+			var component []string
+			for {
+				if len(stack) == 0 {
+					break
+				}
+				w := stack[len(stack)-1]
+				stack = stack[:len(stack)-1]
+				onStack[w] = false
+				component = append(component, w)
+				if w == v {
+					break
+				}
+			}
+			if len(component) > 1 {
+				sccs = append(sccs, component)
+			}
+		}
+	}
+
+	// 遍历所有节点执行强连通分量分析
+	for id := range graph.Nodes {
+		if _, seen := indices[id]; !seen {
+			strongConnect(id)
+		}
+	}
+
+	// 标记处于非单节点 SCC 的所有节点为递归
+	for _, comp := range sccs {
+		for _, nodeID := range comp {
+			if node, exists := graph.Nodes[nodeID]; exists {
+				node.IsRecursive = true
+			}
+		}
+	}
 }
 
 // countEdges 计算边的总数

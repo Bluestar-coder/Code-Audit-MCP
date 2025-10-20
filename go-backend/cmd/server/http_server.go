@@ -89,6 +89,99 @@ func startHTTPServer(vuln *rules.Service, port int) {
 		}
 	})
 
+	mux.HandleFunc("/api/dashboard", func(w http.ResponseWriter, r *http.Request) {
+	    if r.Method == http.MethodOptions {
+	        writeCORSHeaders(w)
+	        w.WriteHeader(http.StatusNoContent)
+	        return
+	    }
+	    if r.Method != http.MethodGet {
+	        writeCORSHeaders(w)
+	        http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+	        return
+	    }
+	    writeCORSHeaders(w)
+	    w.Header().Set("Content-Type", "application/json")
+	    resp := map[string]interface{}{
+	        "project_stats": map[string]interface{}{
+	            "total_files": 0,
+	            "total_lines": 0,
+	            "total_functions": 0,
+	            "total_classes": 0,
+	            "languages": map[string]int{},
+	            "last_scan_time": "",
+	        },
+	        "vulnerability_stats": map[string]interface{}{
+	            "total": 0, "critical": 0, "high": 0, "medium": 0, "low": 0, "fixed": 0,
+	            "by_category": map[string]int{},
+	        },
+	        "scan_history": []map[string]interface{}{},
+	        "trend_data": []map[string]interface{}{},
+	    }
+	    json.NewEncoder(w).Encode(resp)
+	})
+	
+	mux.HandleFunc("/api/stats/project", func(w http.ResponseWriter, r *http.Request) {
+	    if r.Method == http.MethodOptions {
+	        writeCORSHeaders(w)
+	        w.WriteHeader(http.StatusNoContent)
+	        return
+	    }
+	    if r.Method != http.MethodGet {
+	        writeCORSHeaders(w)
+	        http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+	        return
+	    }
+	    writeCORSHeaders(w)
+	    w.Header().Set("Content-Type", "application/json")
+	    resp := map[string]interface{}{
+	        "total_files": 0,
+	        "total_lines": 0,
+	        "total_functions": 0,
+	        "total_classes": 0,
+	        "languages": map[string]int{},
+	        "last_scan_time": "",
+	    }
+	    json.NewEncoder(w).Encode(resp)
+	})
+	
+	mux.HandleFunc("/api/stats/vulnerabilities", func(w http.ResponseWriter, r *http.Request) {
+	    if r.Method == http.MethodOptions {
+	        writeCORSHeaders(w)
+	        w.WriteHeader(http.StatusNoContent)
+	        return
+	    }
+	    if r.Method != http.MethodGet {
+	        writeCORSHeaders(w)
+	        http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+	        return
+	    }
+	    writeCORSHeaders(w)
+	    w.Header().Set("Content-Type", "application/json")
+	    resp := map[string]interface{}{
+	        "total": 0, "critical": 0, "high": 0, "medium": 0, "low": 0, "fixed": 0,
+	        "by_category": map[string]int{},
+	    }
+	    json.NewEncoder(w).Encode(resp)
+	})
+	
+	mux.HandleFunc("/api/scans/history", func(w http.ResponseWriter, r *http.Request) {
+	    if r.Method == http.MethodOptions {
+	        writeCORSHeaders(w)
+	        w.WriteHeader(http.StatusNoContent)
+	        return
+	    }
+	    if r.Method != http.MethodGet {
+	        writeCORSHeaders(w)
+	        http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+	        return
+	    }
+	    writeCORSHeaders(w)
+	    w.Header().Set("Content-Type", "application/json")
+	    resp := []map[string]interface{}{}
+	    json.NewEncoder(w).Encode(resp)
+	})
+
 	addr := fmt.Sprintf(":%d", port)
 	log.Printf("🌐 HTTP API listening on %s", addr)
 	if err := http.ListenAndServe(addr, withCORS(mux)); err != nil {

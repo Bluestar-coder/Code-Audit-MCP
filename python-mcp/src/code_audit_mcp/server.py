@@ -85,10 +85,6 @@ async def list_tools() -> list[types.Tool]:
             inputSchema={
                 "type": "object",
                 "properties": {
-                    "file_path": {
-                        "type": "string",
-                        "description": "Path to source file",
-                    },
                     "source": {
                         "type": "string",
                         "description": "Source variable or function",
@@ -98,7 +94,7 @@ async def list_tools() -> list[types.Tool]:
                         "description": "Sink variable or function",
                     },
                 },
-                "required": ["file_path", "source", "sink"],
+                "required": ["source", "sink"],
             },
         ),
         types.Tool(
