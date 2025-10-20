@@ -3,7 +3,7 @@
 import grpc
 import warnings
 
-import ast_parser_pb2 as ast__parser__pb2
+from proto import ast_parser_pb2 as proto_dot_ast__parser__pb2
 
 GRPC_GENERATED_VERSION = '1.75.1'
 GRPC_VERSION = grpc.__version__
@@ -18,7 +18,7 @@ except ImportError:
 if _version_not_supported:
     raise RuntimeError(
         f'The grpc package installed is at version {GRPC_VERSION},'
-        + f' but the generated code in ast_parser_pb2_grpc.py depends on'
+        + f' but the generated code in proto/ast_parser_pb2_grpc.py depends on'
         + f' grpcio>={GRPC_GENERATED_VERSION}.'
         + f' Please upgrade your grpc module to grpcio>={GRPC_GENERATED_VERSION}'
         + f' or downgrade your generated code using grpcio-tools<={GRPC_VERSION}.'
@@ -37,13 +37,13 @@ class ASTParserStub(object):
         """
         self.ParseFile = channel.unary_unary(
                 '/codeaudit.ASTParser/ParseFile',
-                request_serializer=ast__parser__pb2.ParseRequest.SerializeToString,
-                response_deserializer=ast__parser__pb2.ParseResponse.FromString,
+                request_serializer=proto_dot_ast__parser__pb2.ParseRequest.SerializeToString,
+                response_deserializer=proto_dot_ast__parser__pb2.ParseResponse.FromString,
                 _registered_method=True)
         self.ParseBatch = channel.unary_stream(
                 '/codeaudit.ASTParser/ParseBatch',
-                request_serializer=ast__parser__pb2.BatchParseRequest.SerializeToString,
-                response_deserializer=ast__parser__pb2.ParseResponse.FromString,
+                request_serializer=proto_dot_ast__parser__pb2.BatchParseRequest.SerializeToString,
+                response_deserializer=proto_dot_ast__parser__pb2.ParseResponse.FromString,
                 _registered_method=True)
 
 
@@ -70,13 +70,13 @@ def add_ASTParserServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'ParseFile': grpc.unary_unary_rpc_method_handler(
                     servicer.ParseFile,
-                    request_deserializer=ast__parser__pb2.ParseRequest.FromString,
-                    response_serializer=ast__parser__pb2.ParseResponse.SerializeToString,
+                    request_deserializer=proto_dot_ast__parser__pb2.ParseRequest.FromString,
+                    response_serializer=proto_dot_ast__parser__pb2.ParseResponse.SerializeToString,
             ),
             'ParseBatch': grpc.unary_stream_rpc_method_handler(
                     servicer.ParseBatch,
-                    request_deserializer=ast__parser__pb2.BatchParseRequest.FromString,
-                    response_serializer=ast__parser__pb2.ParseResponse.SerializeToString,
+                    request_deserializer=proto_dot_ast__parser__pb2.BatchParseRequest.FromString,
+                    response_serializer=proto_dot_ast__parser__pb2.ParseResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -105,8 +105,8 @@ class ASTParser(object):
             request,
             target,
             '/codeaudit.ASTParser/ParseFile',
-            ast__parser__pb2.ParseRequest.SerializeToString,
-            ast__parser__pb2.ParseResponse.FromString,
+            proto_dot_ast__parser__pb2.ParseRequest.SerializeToString,
+            proto_dot_ast__parser__pb2.ParseResponse.FromString,
             options,
             channel_credentials,
             insecure,
@@ -132,8 +132,216 @@ class ASTParser(object):
             request,
             target,
             '/codeaudit.ASTParser/ParseBatch',
-            ast__parser__pb2.BatchParseRequest.SerializeToString,
-            ast__parser__pb2.ParseResponse.FromString,
+            proto_dot_ast__parser__pb2.BatchParseRequest.SerializeToString,
+            proto_dot_ast__parser__pb2.ParseResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+
+class VulnerabilityDetectorStub(object):
+    """漏洞检测服务
+    """
+
+    def __init__(self, channel):
+        """Constructor.
+
+        Args:
+            channel: A grpc.Channel.
+        """
+        self.ScanFile = channel.unary_unary(
+                '/codeaudit.VulnerabilityDetector/ScanFile',
+                request_serializer=proto_dot_ast__parser__pb2.ScanFileRequest.SerializeToString,
+                response_deserializer=proto_dot_ast__parser__pb2.ScanFileResponse.FromString,
+                _registered_method=True)
+        self.ScanBatch = channel.unary_unary(
+                '/codeaudit.VulnerabilityDetector/ScanBatch',
+                request_serializer=proto_dot_ast__parser__pb2.ScanBatchRequest.SerializeToString,
+                response_deserializer=proto_dot_ast__parser__pb2.ScanBatchResponse.FromString,
+                _registered_method=True)
+        self.GetRules = channel.unary_unary(
+                '/codeaudit.VulnerabilityDetector/GetRules',
+                request_serializer=proto_dot_ast__parser__pb2.GetRulesRequest.SerializeToString,
+                response_deserializer=proto_dot_ast__parser__pb2.GetRulesResponse.FromString,
+                _registered_method=True)
+        self.GetRuleById = channel.unary_unary(
+                '/codeaudit.VulnerabilityDetector/GetRuleById',
+                request_serializer=proto_dot_ast__parser__pb2.GetRuleByIdRequest.SerializeToString,
+                response_deserializer=proto_dot_ast__parser__pb2.GetRuleByIdResponse.FromString,
+                _registered_method=True)
+
+
+class VulnerabilityDetectorServicer(object):
+    """漏洞检测服务
+    """
+
+    def ScanFile(self, request, context):
+        """扫描单个文件
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def ScanBatch(self, request, context):
+        """批量扫描文件
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetRules(self, request, context):
+        """获取所有规则
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetRuleById(self, request, context):
+        """根据ID获取规则
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+
+def add_VulnerabilityDetectorServicer_to_server(servicer, server):
+    rpc_method_handlers = {
+            'ScanFile': grpc.unary_unary_rpc_method_handler(
+                    servicer.ScanFile,
+                    request_deserializer=proto_dot_ast__parser__pb2.ScanFileRequest.FromString,
+                    response_serializer=proto_dot_ast__parser__pb2.ScanFileResponse.SerializeToString,
+            ),
+            'ScanBatch': grpc.unary_unary_rpc_method_handler(
+                    servicer.ScanBatch,
+                    request_deserializer=proto_dot_ast__parser__pb2.ScanBatchRequest.FromString,
+                    response_serializer=proto_dot_ast__parser__pb2.ScanBatchResponse.SerializeToString,
+            ),
+            'GetRules': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetRules,
+                    request_deserializer=proto_dot_ast__parser__pb2.GetRulesRequest.FromString,
+                    response_serializer=proto_dot_ast__parser__pb2.GetRulesResponse.SerializeToString,
+            ),
+            'GetRuleById': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetRuleById,
+                    request_deserializer=proto_dot_ast__parser__pb2.GetRuleByIdRequest.FromString,
+                    response_serializer=proto_dot_ast__parser__pb2.GetRuleByIdResponse.SerializeToString,
+            ),
+    }
+    generic_handler = grpc.method_handlers_generic_handler(
+            'codeaudit.VulnerabilityDetector', rpc_method_handlers)
+    server.add_generic_rpc_handlers((generic_handler,))
+    server.add_registered_method_handlers('codeaudit.VulnerabilityDetector', rpc_method_handlers)
+
+
+ # This class is part of an EXPERIMENTAL API.
+class VulnerabilityDetector(object):
+    """漏洞检测服务
+    """
+
+    @staticmethod
+    def ScanFile(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/codeaudit.VulnerabilityDetector/ScanFile',
+            proto_dot_ast__parser__pb2.ScanFileRequest.SerializeToString,
+            proto_dot_ast__parser__pb2.ScanFileResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def ScanBatch(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/codeaudit.VulnerabilityDetector/ScanBatch',
+            proto_dot_ast__parser__pb2.ScanBatchRequest.SerializeToString,
+            proto_dot_ast__parser__pb2.ScanBatchResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetRules(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/codeaudit.VulnerabilityDetector/GetRules',
+            proto_dot_ast__parser__pb2.GetRulesRequest.SerializeToString,
+            proto_dot_ast__parser__pb2.GetRulesResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetRuleById(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/codeaudit.VulnerabilityDetector/GetRuleById',
+            proto_dot_ast__parser__pb2.GetRuleByIdRequest.SerializeToString,
+            proto_dot_ast__parser__pb2.GetRuleByIdResponse.FromString,
             options,
             channel_credentials,
             insecure,

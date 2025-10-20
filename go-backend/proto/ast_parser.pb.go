@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.10
 // 	protoc        v6.33.0
-// source: ast_parser.proto
+// source: proto/ast_parser.proto
 
 package proto
 
@@ -88,11 +88,11 @@ func (x Language) String() string {
 }
 
 func (Language) Descriptor() protoreflect.EnumDescriptor {
-	return file_ast_parser_proto_enumTypes[0].Descriptor()
+	return file_proto_ast_parser_proto_enumTypes[0].Descriptor()
 }
 
 func (Language) Type() protoreflect.EnumType {
-	return &file_ast_parser_proto_enumTypes[0]
+	return &file_proto_ast_parser_proto_enumTypes[0]
 }
 
 func (x Language) Number() protoreflect.EnumNumber {
@@ -101,7 +101,7 @@ func (x Language) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use Language.Descriptor instead.
 func (Language) EnumDescriptor() ([]byte, []int) {
-	return file_ast_parser_proto_rawDescGZIP(), []int{0}
+	return file_proto_ast_parser_proto_rawDescGZIP(), []int{0}
 }
 
 // 解析单个文件请求
@@ -117,7 +117,7 @@ type ParseRequest struct {
 
 func (x *ParseRequest) Reset() {
 	*x = ParseRequest{}
-	mi := &file_ast_parser_proto_msgTypes[0]
+	mi := &file_proto_ast_parser_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -129,7 +129,7 @@ func (x *ParseRequest) String() string {
 func (*ParseRequest) ProtoMessage() {}
 
 func (x *ParseRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_ast_parser_proto_msgTypes[0]
+	mi := &file_proto_ast_parser_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -142,7 +142,7 @@ func (x *ParseRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ParseRequest.ProtoReflect.Descriptor instead.
 func (*ParseRequest) Descriptor() ([]byte, []int) {
-	return file_ast_parser_proto_rawDescGZIP(), []int{0}
+	return file_proto_ast_parser_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *ParseRequest) GetFilePath() string {
@@ -187,7 +187,7 @@ type ParseResponse struct {
 
 func (x *ParseResponse) Reset() {
 	*x = ParseResponse{}
-	mi := &file_ast_parser_proto_msgTypes[1]
+	mi := &file_proto_ast_parser_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -199,7 +199,7 @@ func (x *ParseResponse) String() string {
 func (*ParseResponse) ProtoMessage() {}
 
 func (x *ParseResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_ast_parser_proto_msgTypes[1]
+	mi := &file_proto_ast_parser_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -212,7 +212,7 @@ func (x *ParseResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ParseResponse.ProtoReflect.Descriptor instead.
 func (*ParseResponse) Descriptor() ([]byte, []int) {
-	return file_ast_parser_proto_rawDescGZIP(), []int{1}
+	return file_proto_ast_parser_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *ParseResponse) GetFilePath() string {
@@ -263,7 +263,7 @@ type ParseError struct {
 
 func (x *ParseError) Reset() {
 	*x = ParseError{}
-	mi := &file_ast_parser_proto_msgTypes[2]
+	mi := &file_proto_ast_parser_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -275,7 +275,7 @@ func (x *ParseError) String() string {
 func (*ParseError) ProtoMessage() {}
 
 func (x *ParseError) ProtoReflect() protoreflect.Message {
-	mi := &file_ast_parser_proto_msgTypes[2]
+	mi := &file_proto_ast_parser_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -288,7 +288,7 @@ func (x *ParseError) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ParseError.ProtoReflect.Descriptor instead.
 func (*ParseError) Descriptor() ([]byte, []int) {
-	return file_ast_parser_proto_rawDescGZIP(), []int{2}
+	return file_proto_ast_parser_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *ParseError) GetLine() int32 {
@@ -333,7 +333,7 @@ type ParseMetadata struct {
 
 func (x *ParseMetadata) Reset() {
 	*x = ParseMetadata{}
-	mi := &file_ast_parser_proto_msgTypes[3]
+	mi := &file_proto_ast_parser_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -345,7 +345,7 @@ func (x *ParseMetadata) String() string {
 func (*ParseMetadata) ProtoMessage() {}
 
 func (x *ParseMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_ast_parser_proto_msgTypes[3]
+	mi := &file_proto_ast_parser_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -358,7 +358,7 @@ func (x *ParseMetadata) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ParseMetadata.ProtoReflect.Descriptor instead.
 func (*ParseMetadata) Descriptor() ([]byte, []int) {
-	return file_ast_parser_proto_rawDescGZIP(), []int{3}
+	return file_proto_ast_parser_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *ParseMetadata) GetParseTimeMs() int64 {
@@ -407,7 +407,7 @@ type BatchParseRequest struct {
 
 func (x *BatchParseRequest) Reset() {
 	*x = BatchParseRequest{}
-	mi := &file_ast_parser_proto_msgTypes[4]
+	mi := &file_proto_ast_parser_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -419,7 +419,7 @@ func (x *BatchParseRequest) String() string {
 func (*BatchParseRequest) ProtoMessage() {}
 
 func (x *BatchParseRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_ast_parser_proto_msgTypes[4]
+	mi := &file_proto_ast_parser_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -432,7 +432,7 @@ func (x *BatchParseRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BatchParseRequest.ProtoReflect.Descriptor instead.
 func (*BatchParseRequest) Descriptor() ([]byte, []int) {
-	return file_ast_parser_proto_rawDescGZIP(), []int{4}
+	return file_proto_ast_parser_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *BatchParseRequest) GetRequests() []*ParseRequest {
@@ -468,7 +468,7 @@ type ASTNode struct {
 
 func (x *ASTNode) Reset() {
 	*x = ASTNode{}
-	mi := &file_ast_parser_proto_msgTypes[5]
+	mi := &file_proto_ast_parser_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -480,7 +480,7 @@ func (x *ASTNode) String() string {
 func (*ASTNode) ProtoMessage() {}
 
 func (x *ASTNode) ProtoReflect() protoreflect.Message {
-	mi := &file_ast_parser_proto_msgTypes[5]
+	mi := &file_proto_ast_parser_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -493,7 +493,7 @@ func (x *ASTNode) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ASTNode.ProtoReflect.Descriptor instead.
 func (*ASTNode) Descriptor() ([]byte, []int) {
-	return file_ast_parser_proto_rawDescGZIP(), []int{5}
+	return file_proto_ast_parser_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *ASTNode) GetId() string {
@@ -577,7 +577,7 @@ type KeyValue struct {
 
 func (x *KeyValue) Reset() {
 	*x = KeyValue{}
-	mi := &file_ast_parser_proto_msgTypes[6]
+	mi := &file_proto_ast_parser_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -589,7 +589,7 @@ func (x *KeyValue) String() string {
 func (*KeyValue) ProtoMessage() {}
 
 func (x *KeyValue) ProtoReflect() protoreflect.Message {
-	mi := &file_ast_parser_proto_msgTypes[6]
+	mi := &file_proto_ast_parser_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -602,7 +602,7 @@ func (x *KeyValue) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use KeyValue.ProtoReflect.Descriptor instead.
 func (*KeyValue) Descriptor() ([]byte, []int) {
-	return file_ast_parser_proto_rawDescGZIP(), []int{6}
+	return file_proto_ast_parser_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *KeyValue) GetKey() string {
@@ -619,11 +619,762 @@ func (x *KeyValue) GetValue() string {
 	return ""
 }
 
-var File_ast_parser_proto protoreflect.FileDescriptor
+// 扫描文件请求
+type ScanFileRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	FilePath      string                 `protobuf:"bytes,1,opt,name=file_path,json=filePath,proto3" json:"file_path,omitempty"` // 文件路径
+	Language      string                 `protobuf:"bytes,2,opt,name=language,proto3" json:"language,omitempty"`                 // 编程语言
+	Content       string                 `protobuf:"bytes,3,opt,name=content,proto3" json:"content,omitempty"`                   // 文件内容
+	RuleIds       []string               `protobuf:"bytes,4,rep,name=rule_ids,json=ruleIds,proto3" json:"rule_ids,omitempty"`    // 指定要使用的规则ID（为空则使用所有规则）
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
 
-const file_ast_parser_proto_rawDesc = "" +
+func (x *ScanFileRequest) Reset() {
+	*x = ScanFileRequest{}
+	mi := &file_proto_ast_parser_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ScanFileRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ScanFileRequest) ProtoMessage() {}
+
+func (x *ScanFileRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_ast_parser_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ScanFileRequest.ProtoReflect.Descriptor instead.
+func (*ScanFileRequest) Descriptor() ([]byte, []int) {
+	return file_proto_ast_parser_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *ScanFileRequest) GetFilePath() string {
+	if x != nil {
+		return x.FilePath
+	}
+	return ""
+}
+
+func (x *ScanFileRequest) GetLanguage() string {
+	if x != nil {
+		return x.Language
+	}
+	return ""
+}
+
+func (x *ScanFileRequest) GetContent() string {
+	if x != nil {
+		return x.Content
+	}
+	return ""
+}
+
+func (x *ScanFileRequest) GetRuleIds() []string {
+	if x != nil {
+		return x.RuleIds
+	}
+	return nil
+}
+
+// 扫描文件响应
+type ScanFileResponse struct {
+	state         protoimpl.MessageState  `protogen:"open.v1"`
+	Success       bool                    `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`                  // 是否成功
+	FilePath      string                  `protobuf:"bytes,2,opt,name=file_path,json=filePath,proto3" json:"file_path,omitempty"` // 文件路径
+	Language      string                  `protobuf:"bytes,3,opt,name=language,proto3" json:"language,omitempty"`                 // 检测到的语言
+	Findings      []*VulnerabilityFinding `protobuf:"bytes,4,rep,name=findings,proto3" json:"findings,omitempty"`                 // 发现的漏洞
+	Statistics    string                  `protobuf:"bytes,5,opt,name=statistics,proto3" json:"statistics,omitempty"`             // 统计信息（JSON格式）
+	Error         string                  `protobuf:"bytes,6,opt,name=error,proto3" json:"error,omitempty"`                       // 错误信息
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ScanFileResponse) Reset() {
+	*x = ScanFileResponse{}
+	mi := &file_proto_ast_parser_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ScanFileResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ScanFileResponse) ProtoMessage() {}
+
+func (x *ScanFileResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_ast_parser_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ScanFileResponse.ProtoReflect.Descriptor instead.
+func (*ScanFileResponse) Descriptor() ([]byte, []int) {
+	return file_proto_ast_parser_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *ScanFileResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *ScanFileResponse) GetFilePath() string {
+	if x != nil {
+		return x.FilePath
+	}
+	return ""
+}
+
+func (x *ScanFileResponse) GetLanguage() string {
+	if x != nil {
+		return x.Language
+	}
+	return ""
+}
+
+func (x *ScanFileResponse) GetFindings() []*VulnerabilityFinding {
+	if x != nil {
+		return x.Findings
+	}
+	return nil
+}
+
+func (x *ScanFileResponse) GetStatistics() string {
+	if x != nil {
+		return x.Statistics
+	}
+	return ""
+}
+
+func (x *ScanFileResponse) GetError() string {
+	if x != nil {
+		return x.Error
+	}
+	return ""
+}
+
+// 批量扫描请求
+type ScanBatchRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Files         []*ScanFileRequest     `protobuf:"bytes,1,rep,name=files,proto3" json:"files,omitempty"`                    // 待扫描文件列表
+	RuleIds       []string               `protobuf:"bytes,2,rep,name=rule_ids,json=ruleIds,proto3" json:"rule_ids,omitempty"` // 指定要使用的规则ID
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ScanBatchRequest) Reset() {
+	*x = ScanBatchRequest{}
+	mi := &file_proto_ast_parser_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ScanBatchRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ScanBatchRequest) ProtoMessage() {}
+
+func (x *ScanBatchRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_ast_parser_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ScanBatchRequest.ProtoReflect.Descriptor instead.
+func (*ScanBatchRequest) Descriptor() ([]byte, []int) {
+	return file_proto_ast_parser_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *ScanBatchRequest) GetFiles() []*ScanFileRequest {
+	if x != nil {
+		return x.Files
+	}
+	return nil
+}
+
+func (x *ScanBatchRequest) GetRuleIds() []string {
+	if x != nil {
+		return x.RuleIds
+	}
+	return nil
+}
+
+// 批量扫描响应
+type ScanBatchResponse struct {
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	Results           []*ScanFileResponse    `protobuf:"bytes,1,rep,name=results,proto3" json:"results,omitempty"`                                              // 扫描结果
+	OverallStatistics string                 `protobuf:"bytes,2,opt,name=overall_statistics,json=overallStatistics,proto3" json:"overall_statistics,omitempty"` // 总体统计信息（JSON格式）
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *ScanBatchResponse) Reset() {
+	*x = ScanBatchResponse{}
+	mi := &file_proto_ast_parser_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ScanBatchResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ScanBatchResponse) ProtoMessage() {}
+
+func (x *ScanBatchResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_ast_parser_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ScanBatchResponse.ProtoReflect.Descriptor instead.
+func (*ScanBatchResponse) Descriptor() ([]byte, []int) {
+	return file_proto_ast_parser_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *ScanBatchResponse) GetResults() []*ScanFileResponse {
+	if x != nil {
+		return x.Results
+	}
+	return nil
+}
+
+func (x *ScanBatchResponse) GetOverallStatistics() string {
+	if x != nil {
+		return x.OverallStatistics
+	}
+	return ""
+}
+
+// 漏洞发现
+type VulnerabilityFinding struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	RuleId        string                 `protobuf:"bytes,1,opt,name=rule_id,json=ruleId,proto3" json:"rule_id,omitempty"`       // 规则ID
+	RuleName      string                 `protobuf:"bytes,2,opt,name=rule_name,json=ruleName,proto3" json:"rule_name,omitempty"` // 规则名称
+	Category      string                 `protobuf:"bytes,3,opt,name=category,proto3" json:"category,omitempty"`                 // 漏洞类别
+	Severity      string                 `protobuf:"bytes,4,opt,name=severity,proto3" json:"severity,omitempty"`                 // 严重程度
+	Message       string                 `protobuf:"bytes,5,opt,name=message,proto3" json:"message,omitempty"`                   // 描述信息
+	FilePath      string                 `protobuf:"bytes,6,opt,name=file_path,json=filePath,proto3" json:"file_path,omitempty"` // 文件路径
+	Line          int32                  `protobuf:"varint,7,opt,name=line,proto3" json:"line,omitempty"`                        // 行号
+	Column        int32                  `protobuf:"varint,8,opt,name=column,proto3" json:"column,omitempty"`                    // 列号
+	Code          string                 `protobuf:"bytes,9,opt,name=code,proto3" json:"code,omitempty"`                         // 相关代码
+	Language      string                 `protobuf:"bytes,10,opt,name=language,proto3" json:"language,omitempty"`                // 编程语言
+	Metadata      string                 `protobuf:"bytes,11,opt,name=metadata,proto3" json:"metadata,omitempty"`                // 元数据（JSON格式）
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *VulnerabilityFinding) Reset() {
+	*x = VulnerabilityFinding{}
+	mi := &file_proto_ast_parser_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *VulnerabilityFinding) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*VulnerabilityFinding) ProtoMessage() {}
+
+func (x *VulnerabilityFinding) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_ast_parser_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use VulnerabilityFinding.ProtoReflect.Descriptor instead.
+func (*VulnerabilityFinding) Descriptor() ([]byte, []int) {
+	return file_proto_ast_parser_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *VulnerabilityFinding) GetRuleId() string {
+	if x != nil {
+		return x.RuleId
+	}
+	return ""
+}
+
+func (x *VulnerabilityFinding) GetRuleName() string {
+	if x != nil {
+		return x.RuleName
+	}
+	return ""
+}
+
+func (x *VulnerabilityFinding) GetCategory() string {
+	if x != nil {
+		return x.Category
+	}
+	return ""
+}
+
+func (x *VulnerabilityFinding) GetSeverity() string {
+	if x != nil {
+		return x.Severity
+	}
+	return ""
+}
+
+func (x *VulnerabilityFinding) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *VulnerabilityFinding) GetFilePath() string {
+	if x != nil {
+		return x.FilePath
+	}
+	return ""
+}
+
+func (x *VulnerabilityFinding) GetLine() int32 {
+	if x != nil {
+		return x.Line
+	}
+	return 0
+}
+
+func (x *VulnerabilityFinding) GetColumn() int32 {
+	if x != nil {
+		return x.Column
+	}
+	return 0
+}
+
+func (x *VulnerabilityFinding) GetCode() string {
+	if x != nil {
+		return x.Code
+	}
+	return ""
+}
+
+func (x *VulnerabilityFinding) GetLanguage() string {
+	if x != nil {
+		return x.Language
+	}
+	return ""
+}
+
+func (x *VulnerabilityFinding) GetMetadata() string {
+	if x != nil {
+		return x.Metadata
+	}
+	return ""
+}
+
+// 获取规则请求
+type GetRulesRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Language      string                 `protobuf:"bytes,1,opt,name=language,proto3" json:"language,omitempty"` // 按语言过滤（可选）
+	Category      string                 `protobuf:"bytes,2,opt,name=category,proto3" json:"category,omitempty"` // 按类别过滤（可选）
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetRulesRequest) Reset() {
+	*x = GetRulesRequest{}
+	mi := &file_proto_ast_parser_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetRulesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetRulesRequest) ProtoMessage() {}
+
+func (x *GetRulesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_ast_parser_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetRulesRequest.ProtoReflect.Descriptor instead.
+func (*GetRulesRequest) Descriptor() ([]byte, []int) {
+	return file_proto_ast_parser_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *GetRulesRequest) GetLanguage() string {
+	if x != nil {
+		return x.Language
+	}
+	return ""
+}
+
+func (x *GetRulesRequest) GetCategory() string {
+	if x != nil {
+		return x.Category
+	}
+	return ""
+}
+
+// 获取规则响应
+type GetRulesResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Rules         []*VulnerabilityRule   `protobuf:"bytes,1,rep,name=rules,proto3" json:"rules,omitempty"` // 规则列表
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetRulesResponse) Reset() {
+	*x = GetRulesResponse{}
+	mi := &file_proto_ast_parser_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetRulesResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetRulesResponse) ProtoMessage() {}
+
+func (x *GetRulesResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_ast_parser_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetRulesResponse.ProtoReflect.Descriptor instead.
+func (*GetRulesResponse) Descriptor() ([]byte, []int) {
+	return file_proto_ast_parser_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *GetRulesResponse) GetRules() []*VulnerabilityRule {
+	if x != nil {
+		return x.Rules
+	}
+	return nil
+}
+
+// 根据ID获取规则请求
+type GetRuleByIdRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	RuleId        string                 `protobuf:"bytes,1,opt,name=rule_id,json=ruleId,proto3" json:"rule_id,omitempty"` // 规则ID
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetRuleByIdRequest) Reset() {
+	*x = GetRuleByIdRequest{}
+	mi := &file_proto_ast_parser_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetRuleByIdRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetRuleByIdRequest) ProtoMessage() {}
+
+func (x *GetRuleByIdRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_ast_parser_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetRuleByIdRequest.ProtoReflect.Descriptor instead.
+func (*GetRuleByIdRequest) Descriptor() ([]byte, []int) {
+	return file_proto_ast_parser_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *GetRuleByIdRequest) GetRuleId() string {
+	if x != nil {
+		return x.RuleId
+	}
+	return ""
+}
+
+// 根据ID获取规则响应
+type GetRuleByIdResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Found         bool                   `protobuf:"varint,1,opt,name=found,proto3" json:"found,omitempty"` // 是否找到
+	Rule          *VulnerabilityRule     `protobuf:"bytes,2,opt,name=rule,proto3" json:"rule,omitempty"`    // 规则信息
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetRuleByIdResponse) Reset() {
+	*x = GetRuleByIdResponse{}
+	mi := &file_proto_ast_parser_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetRuleByIdResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetRuleByIdResponse) ProtoMessage() {}
+
+func (x *GetRuleByIdResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_ast_parser_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetRuleByIdResponse.ProtoReflect.Descriptor instead.
+func (*GetRuleByIdResponse) Descriptor() ([]byte, []int) {
+	return file_proto_ast_parser_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *GetRuleByIdResponse) GetFound() bool {
+	if x != nil {
+		return x.Found
+	}
+	return false
+}
+
+func (x *GetRuleByIdResponse) GetRule() *VulnerabilityRule {
+	if x != nil {
+		return x.Rule
+	}
+	return nil
+}
+
+// 漏洞检测规则
+type VulnerabilityRule struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`                                     // 规则名称
+	Id            string                 `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`                                         // 规则ID
+	Category      string                 `protobuf:"bytes,3,opt,name=category,proto3" json:"category,omitempty"`                             // 类别
+	Severity      string                 `protobuf:"bytes,4,opt,name=severity,proto3" json:"severity,omitempty"`                             // 严重程度
+	Description   string                 `protobuf:"bytes,5,opt,name=description,proto3" json:"description,omitempty"`                       // 描述
+	Language      []string               `protobuf:"bytes,6,rep,name=language,proto3" json:"language,omitempty"`                             // 适用语言
+	Patterns      []*RulePattern         `protobuf:"bytes,7,rep,name=patterns,proto3" json:"patterns,omitempty"`                             // 检测模式
+	SafePatterns  []*RulePattern         `protobuf:"bytes,8,rep,name=safe_patterns,json=safePatterns,proto3" json:"safe_patterns,omitempty"` // 安全模式
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *VulnerabilityRule) Reset() {
+	*x = VulnerabilityRule{}
+	mi := &file_proto_ast_parser_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *VulnerabilityRule) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*VulnerabilityRule) ProtoMessage() {}
+
+func (x *VulnerabilityRule) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_ast_parser_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use VulnerabilityRule.ProtoReflect.Descriptor instead.
+func (*VulnerabilityRule) Descriptor() ([]byte, []int) {
+	return file_proto_ast_parser_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *VulnerabilityRule) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *VulnerabilityRule) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *VulnerabilityRule) GetCategory() string {
+	if x != nil {
+		return x.Category
+	}
+	return ""
+}
+
+func (x *VulnerabilityRule) GetSeverity() string {
+	if x != nil {
+		return x.Severity
+	}
+	return ""
+}
+
+func (x *VulnerabilityRule) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *VulnerabilityRule) GetLanguage() []string {
+	if x != nil {
+		return x.Language
+	}
+	return nil
+}
+
+func (x *VulnerabilityRule) GetPatterns() []*RulePattern {
+	if x != nil {
+		return x.Patterns
+	}
+	return nil
+}
+
+func (x *VulnerabilityRule) GetSafePatterns() []*RulePattern {
+	if x != nil {
+		return x.SafePatterns
+	}
+	return nil
+}
+
+// 规则模式
+type RulePattern struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Pattern       string                 `protobuf:"bytes,1,opt,name=pattern,proto3" json:"pattern,omitempty"`   // 正则表达式模式
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`   // 匹配时的消息
+	Severity      string                 `protobuf:"bytes,3,opt,name=severity,proto3" json:"severity,omitempty"` // 严重程度
+	Language      []string               `protobuf:"bytes,4,rep,name=language,proto3" json:"language,omitempty"` // 适用语言
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RulePattern) Reset() {
+	*x = RulePattern{}
+	mi := &file_proto_ast_parser_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RulePattern) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RulePattern) ProtoMessage() {}
+
+func (x *RulePattern) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_ast_parser_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RulePattern.ProtoReflect.Descriptor instead.
+func (*RulePattern) Descriptor() ([]byte, []int) {
+	return file_proto_ast_parser_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *RulePattern) GetPattern() string {
+	if x != nil {
+		return x.Pattern
+	}
+	return ""
+}
+
+func (x *RulePattern) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *RulePattern) GetSeverity() string {
+	if x != nil {
+		return x.Severity
+	}
+	return ""
+}
+
+func (x *RulePattern) GetLanguage() []string {
+	if x != nil {
+		return x.Language
+	}
+	return nil
+}
+
+var File_proto_ast_parser_proto protoreflect.FileDescriptor
+
+const file_proto_ast_parser_proto_rawDesc = "" +
 	"\n" +
-	"\x10ast_parser.proto\x12\tcodeaudit\"\x8c\x01\n" +
+	"\x16proto/ast_parser.proto\x12\tcodeaudit\"\x8c\x01\n" +
 	"\fParseRequest\x12\x1b\n" +
 	"\tfile_path\x18\x01 \x01(\tR\bfilePath\x12\x1a\n" +
 	"\blanguage\x18\x02 \x01(\tR\blanguage\x12\x18\n" +
@@ -671,7 +1422,64 @@ const file_ast_parser_proto_rawDesc = "" +
 	"attributes\"2\n" +
 	"\bKeyValue\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value*\xa7\x01\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value\"\x7f\n" +
+	"\x0fScanFileRequest\x12\x1b\n" +
+	"\tfile_path\x18\x01 \x01(\tR\bfilePath\x12\x1a\n" +
+	"\blanguage\x18\x02 \x01(\tR\blanguage\x12\x18\n" +
+	"\acontent\x18\x03 \x01(\tR\acontent\x12\x19\n" +
+	"\brule_ids\x18\x04 \x03(\tR\aruleIds\"\xd8\x01\n" +
+	"\x10ScanFileResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x1b\n" +
+	"\tfile_path\x18\x02 \x01(\tR\bfilePath\x12\x1a\n" +
+	"\blanguage\x18\x03 \x01(\tR\blanguage\x12;\n" +
+	"\bfindings\x18\x04 \x03(\v2\x1f.codeaudit.VulnerabilityFindingR\bfindings\x12\x1e\n" +
+	"\n" +
+	"statistics\x18\x05 \x01(\tR\n" +
+	"statistics\x12\x14\n" +
+	"\x05error\x18\x06 \x01(\tR\x05error\"_\n" +
+	"\x10ScanBatchRequest\x120\n" +
+	"\x05files\x18\x01 \x03(\v2\x1a.codeaudit.ScanFileRequestR\x05files\x12\x19\n" +
+	"\brule_ids\x18\x02 \x03(\tR\aruleIds\"y\n" +
+	"\x11ScanBatchResponse\x125\n" +
+	"\aresults\x18\x01 \x03(\v2\x1b.codeaudit.ScanFileResponseR\aresults\x12-\n" +
+	"\x12overall_statistics\x18\x02 \x01(\tR\x11overallStatistics\"\xb3\x02\n" +
+	"\x14VulnerabilityFinding\x12\x17\n" +
+	"\arule_id\x18\x01 \x01(\tR\x06ruleId\x12\x1b\n" +
+	"\trule_name\x18\x02 \x01(\tR\bruleName\x12\x1a\n" +
+	"\bcategory\x18\x03 \x01(\tR\bcategory\x12\x1a\n" +
+	"\bseverity\x18\x04 \x01(\tR\bseverity\x12\x18\n" +
+	"\amessage\x18\x05 \x01(\tR\amessage\x12\x1b\n" +
+	"\tfile_path\x18\x06 \x01(\tR\bfilePath\x12\x12\n" +
+	"\x04line\x18\a \x01(\x05R\x04line\x12\x16\n" +
+	"\x06column\x18\b \x01(\x05R\x06column\x12\x12\n" +
+	"\x04code\x18\t \x01(\tR\x04code\x12\x1a\n" +
+	"\blanguage\x18\n" +
+	" \x01(\tR\blanguage\x12\x1a\n" +
+	"\bmetadata\x18\v \x01(\tR\bmetadata\"I\n" +
+	"\x0fGetRulesRequest\x12\x1a\n" +
+	"\blanguage\x18\x01 \x01(\tR\blanguage\x12\x1a\n" +
+	"\bcategory\x18\x02 \x01(\tR\bcategory\"F\n" +
+	"\x10GetRulesResponse\x122\n" +
+	"\x05rules\x18\x01 \x03(\v2\x1c.codeaudit.VulnerabilityRuleR\x05rules\"-\n" +
+	"\x12GetRuleByIdRequest\x12\x17\n" +
+	"\arule_id\x18\x01 \x01(\tR\x06ruleId\"]\n" +
+	"\x13GetRuleByIdResponse\x12\x14\n" +
+	"\x05found\x18\x01 \x01(\bR\x05found\x120\n" +
+	"\x04rule\x18\x02 \x01(\v2\x1c.codeaudit.VulnerabilityRuleR\x04rule\"\x9e\x02\n" +
+	"\x11VulnerabilityRule\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x0e\n" +
+	"\x02id\x18\x02 \x01(\tR\x02id\x12\x1a\n" +
+	"\bcategory\x18\x03 \x01(\tR\bcategory\x12\x1a\n" +
+	"\bseverity\x18\x04 \x01(\tR\bseverity\x12 \n" +
+	"\vdescription\x18\x05 \x01(\tR\vdescription\x12\x1a\n" +
+	"\blanguage\x18\x06 \x03(\tR\blanguage\x122\n" +
+	"\bpatterns\x18\a \x03(\v2\x16.codeaudit.RulePatternR\bpatterns\x12;\n" +
+	"\rsafe_patterns\x18\b \x03(\v2\x16.codeaudit.RulePatternR\fsafePatterns\"y\n" +
+	"\vRulePattern\x12\x18\n" +
+	"\apattern\x18\x01 \x01(\tR\apattern\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12\x1a\n" +
+	"\bseverity\x18\x03 \x01(\tR\bseverity\x12\x1a\n" +
+	"\blanguage\x18\x04 \x03(\tR\blanguage*\xa7\x01\n" +
 	"\bLanguage\x12\v\n" +
 	"\aUNKNOWN\x10\x00\x12\x06\n" +
 	"\x02GO\x10\x01\x12\n" +
@@ -695,71 +1503,102 @@ const file_ast_parser_proto_rawDesc = "" +
 	"\tASTParser\x12>\n" +
 	"\tParseFile\x12\x17.codeaudit.ParseRequest\x1a\x18.codeaudit.ParseResponse\x12F\n" +
 	"\n" +
-	"ParseBatch\x12\x1c.codeaudit.BatchParseRequest\x1a\x18.codeaudit.ParseResponse0\x01B\x1e\n" +
+	"ParseBatch\x12\x1c.codeaudit.BatchParseRequest\x1a\x18.codeaudit.ParseResponse0\x012\xb7\x02\n" +
+	"\x15VulnerabilityDetector\x12C\n" +
+	"\bScanFile\x12\x1a.codeaudit.ScanFileRequest\x1a\x1b.codeaudit.ScanFileResponse\x12F\n" +
+	"\tScanBatch\x12\x1b.codeaudit.ScanBatchRequest\x1a\x1c.codeaudit.ScanBatchResponse\x12C\n" +
+	"\bGetRules\x12\x1a.codeaudit.GetRulesRequest\x1a\x1b.codeaudit.GetRulesResponse\x12L\n" +
+	"\vGetRuleById\x12\x1d.codeaudit.GetRuleByIdRequest\x1a\x1e.codeaudit.GetRuleByIdResponseB\x1e\n" +
 	"\x13com.codeaudit.protoZ\a./protob\x06proto3"
 
 var (
-	file_ast_parser_proto_rawDescOnce sync.Once
-	file_ast_parser_proto_rawDescData []byte
+	file_proto_ast_parser_proto_rawDescOnce sync.Once
+	file_proto_ast_parser_proto_rawDescData []byte
 )
 
-func file_ast_parser_proto_rawDescGZIP() []byte {
-	file_ast_parser_proto_rawDescOnce.Do(func() {
-		file_ast_parser_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_ast_parser_proto_rawDesc), len(file_ast_parser_proto_rawDesc)))
+func file_proto_ast_parser_proto_rawDescGZIP() []byte {
+	file_proto_ast_parser_proto_rawDescOnce.Do(func() {
+		file_proto_ast_parser_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_proto_ast_parser_proto_rawDesc), len(file_proto_ast_parser_proto_rawDesc)))
 	})
-	return file_ast_parser_proto_rawDescData
+	return file_proto_ast_parser_proto_rawDescData
 }
 
-var file_ast_parser_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_ast_parser_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
-var file_ast_parser_proto_goTypes = []any{
-	(Language)(0),             // 0: codeaudit.Language
-	(*ParseRequest)(nil),      // 1: codeaudit.ParseRequest
-	(*ParseResponse)(nil),     // 2: codeaudit.ParseResponse
-	(*ParseError)(nil),        // 3: codeaudit.ParseError
-	(*ParseMetadata)(nil),     // 4: codeaudit.ParseMetadata
-	(*BatchParseRequest)(nil), // 5: codeaudit.BatchParseRequest
-	(*ASTNode)(nil),           // 6: codeaudit.ASTNode
-	(*KeyValue)(nil),          // 7: codeaudit.KeyValue
+var file_proto_ast_parser_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_proto_ast_parser_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
+var file_proto_ast_parser_proto_goTypes = []any{
+	(Language)(0),                // 0: codeaudit.Language
+	(*ParseRequest)(nil),         // 1: codeaudit.ParseRequest
+	(*ParseResponse)(nil),        // 2: codeaudit.ParseResponse
+	(*ParseError)(nil),           // 3: codeaudit.ParseError
+	(*ParseMetadata)(nil),        // 4: codeaudit.ParseMetadata
+	(*BatchParseRequest)(nil),    // 5: codeaudit.BatchParseRequest
+	(*ASTNode)(nil),              // 6: codeaudit.ASTNode
+	(*KeyValue)(nil),             // 7: codeaudit.KeyValue
+	(*ScanFileRequest)(nil),      // 8: codeaudit.ScanFileRequest
+	(*ScanFileResponse)(nil),     // 9: codeaudit.ScanFileResponse
+	(*ScanBatchRequest)(nil),     // 10: codeaudit.ScanBatchRequest
+	(*ScanBatchResponse)(nil),    // 11: codeaudit.ScanBatchResponse
+	(*VulnerabilityFinding)(nil), // 12: codeaudit.VulnerabilityFinding
+	(*GetRulesRequest)(nil),      // 13: codeaudit.GetRulesRequest
+	(*GetRulesResponse)(nil),     // 14: codeaudit.GetRulesResponse
+	(*GetRuleByIdRequest)(nil),   // 15: codeaudit.GetRuleByIdRequest
+	(*GetRuleByIdResponse)(nil),  // 16: codeaudit.GetRuleByIdResponse
+	(*VulnerabilityRule)(nil),    // 17: codeaudit.VulnerabilityRule
+	(*RulePattern)(nil),          // 18: codeaudit.RulePattern
 }
-var file_ast_parser_proto_depIdxs = []int32{
-	3, // 0: codeaudit.ParseResponse.errors:type_name -> codeaudit.ParseError
-	4, // 1: codeaudit.ParseResponse.metadata:type_name -> codeaudit.ParseMetadata
-	1, // 2: codeaudit.BatchParseRequest.requests:type_name -> codeaudit.ParseRequest
-	6, // 3: codeaudit.ASTNode.children:type_name -> codeaudit.ASTNode
-	7, // 4: codeaudit.ASTNode.attributes:type_name -> codeaudit.KeyValue
-	1, // 5: codeaudit.ASTParser.ParseFile:input_type -> codeaudit.ParseRequest
-	5, // 6: codeaudit.ASTParser.ParseBatch:input_type -> codeaudit.BatchParseRequest
-	2, // 7: codeaudit.ASTParser.ParseFile:output_type -> codeaudit.ParseResponse
-	2, // 8: codeaudit.ASTParser.ParseBatch:output_type -> codeaudit.ParseResponse
-	7, // [7:9] is the sub-list for method output_type
-	5, // [5:7] is the sub-list for method input_type
-	5, // [5:5] is the sub-list for extension type_name
-	5, // [5:5] is the sub-list for extension extendee
-	0, // [0:5] is the sub-list for field type_name
+var file_proto_ast_parser_proto_depIdxs = []int32{
+	3,  // 0: codeaudit.ParseResponse.errors:type_name -> codeaudit.ParseError
+	4,  // 1: codeaudit.ParseResponse.metadata:type_name -> codeaudit.ParseMetadata
+	1,  // 2: codeaudit.BatchParseRequest.requests:type_name -> codeaudit.ParseRequest
+	6,  // 3: codeaudit.ASTNode.children:type_name -> codeaudit.ASTNode
+	7,  // 4: codeaudit.ASTNode.attributes:type_name -> codeaudit.KeyValue
+	12, // 5: codeaudit.ScanFileResponse.findings:type_name -> codeaudit.VulnerabilityFinding
+	8,  // 6: codeaudit.ScanBatchRequest.files:type_name -> codeaudit.ScanFileRequest
+	9,  // 7: codeaudit.ScanBatchResponse.results:type_name -> codeaudit.ScanFileResponse
+	17, // 8: codeaudit.GetRulesResponse.rules:type_name -> codeaudit.VulnerabilityRule
+	17, // 9: codeaudit.GetRuleByIdResponse.rule:type_name -> codeaudit.VulnerabilityRule
+	18, // 10: codeaudit.VulnerabilityRule.patterns:type_name -> codeaudit.RulePattern
+	18, // 11: codeaudit.VulnerabilityRule.safe_patterns:type_name -> codeaudit.RulePattern
+	1,  // 12: codeaudit.ASTParser.ParseFile:input_type -> codeaudit.ParseRequest
+	5,  // 13: codeaudit.ASTParser.ParseBatch:input_type -> codeaudit.BatchParseRequest
+	8,  // 14: codeaudit.VulnerabilityDetector.ScanFile:input_type -> codeaudit.ScanFileRequest
+	10, // 15: codeaudit.VulnerabilityDetector.ScanBatch:input_type -> codeaudit.ScanBatchRequest
+	13, // 16: codeaudit.VulnerabilityDetector.GetRules:input_type -> codeaudit.GetRulesRequest
+	15, // 17: codeaudit.VulnerabilityDetector.GetRuleById:input_type -> codeaudit.GetRuleByIdRequest
+	2,  // 18: codeaudit.ASTParser.ParseFile:output_type -> codeaudit.ParseResponse
+	2,  // 19: codeaudit.ASTParser.ParseBatch:output_type -> codeaudit.ParseResponse
+	9,  // 20: codeaudit.VulnerabilityDetector.ScanFile:output_type -> codeaudit.ScanFileResponse
+	11, // 21: codeaudit.VulnerabilityDetector.ScanBatch:output_type -> codeaudit.ScanBatchResponse
+	14, // 22: codeaudit.VulnerabilityDetector.GetRules:output_type -> codeaudit.GetRulesResponse
+	16, // 23: codeaudit.VulnerabilityDetector.GetRuleById:output_type -> codeaudit.GetRuleByIdResponse
+	18, // [18:24] is the sub-list for method output_type
+	12, // [12:18] is the sub-list for method input_type
+	12, // [12:12] is the sub-list for extension type_name
+	12, // [12:12] is the sub-list for extension extendee
+	0,  // [0:12] is the sub-list for field type_name
 }
 
-func init() { file_ast_parser_proto_init() }
-func file_ast_parser_proto_init() {
-	if File_ast_parser_proto != nil {
+func init() { file_proto_ast_parser_proto_init() }
+func file_proto_ast_parser_proto_init() {
+	if File_proto_ast_parser_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_ast_parser_proto_rawDesc), len(file_ast_parser_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_ast_parser_proto_rawDesc), len(file_proto_ast_parser_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   7,
+			NumMessages:   18,
 			NumExtensions: 0,
-			NumServices:   1,
+			NumServices:   2,
 		},
-		GoTypes:           file_ast_parser_proto_goTypes,
-		DependencyIndexes: file_ast_parser_proto_depIdxs,
-		EnumInfos:         file_ast_parser_proto_enumTypes,
-		MessageInfos:      file_ast_parser_proto_msgTypes,
+		GoTypes:           file_proto_ast_parser_proto_goTypes,
+		DependencyIndexes: file_proto_ast_parser_proto_depIdxs,
+		EnumInfos:         file_proto_ast_parser_proto_enumTypes,
+		MessageInfos:      file_proto_ast_parser_proto_msgTypes,
 	}.Build()
-	File_ast_parser_proto = out.File
-	file_ast_parser_proto_goTypes = nil
-	file_ast_parser_proto_depIdxs = nil
+	File_proto_ast_parser_proto = out.File
+	file_proto_ast_parser_proto_goTypes = nil
+	file_proto_ast_parser_proto_depIdxs = nil
 }

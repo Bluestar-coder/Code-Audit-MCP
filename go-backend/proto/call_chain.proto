@@ -1,0 +1,160 @@
+syntax = "proto3";
+
+package codeaudit;
+
+option go_package = "./proto";
+option java_package = "com.codeaudit.proto";
+
+// 调用链分析服务
+service CallChainAnalyzer {
+  // 构建调用图
+  rpc BuildCallGraph(BuildCallGraphRequest) returns (BuildCallGraphResponse);
+  
+  // 查询调用路径
+  rpc QueryCallPath(QueryCallPathRequest) returns (QueryCallPathResponse);
+  
+  // 查询调用深度
+  rpc QueryCallDepth(QueryCallDepthRequest) returns (QueryCallDepthResponse);
+  
+  // 分析循环调用
+  rpc AnalyzeCycles(AnalyzeCyclesRequest) returns (AnalyzeCyclesResponse);
+  
+  // 查询死代码
+  rpc FindDeadCode(FindDeadCodeRequest) returns (FindDeadCodeResponse);
+}
+
+// 构建调用图请求
+message BuildCallGraphRequest {
+  string file_path = 1;           // 文件路径
+  repeated string entry_points = 2; // 入口点
+  bool include_external = 3;      // 是否包含外部调用
+  int32 max_depth = 4;            // 最大深度
+}
+
+// 构建调用图响应
+message BuildCallGraphResponse {
+  bool success = 1;               // 是否成功
+  string graph_id = 2;            // 图ID
+  int32 node_count = 3;           // 节点数
+  int32 edge_count = 4;           // 边数
+  int32 build_time_ms = 5;        // 构建耗时
+  string error_message = 6;       // 错误信息
+}
+
+// 调用图节点
+message CallGraphNode {
+  string node_id = 1;             // 节点ID
+  string function_name = 2;       // 函数名
+  string file_path = 3;           // 文件路径
+  int32 line_number = 4;          // 行号
+  int32 in_degree = 5;            // 入度（被调用次数）
+  int32 out_degree = 6;           // 出度（调用其他函数次数）
+  bool is_external = 7;           // 是否外部函数
+  bool is_recursive = 8;          // 是否递归
+  string node_type = 9;           // 节点类型（method, function, lambda等）
+}
+
+// 调用图边
+message CallGraphEdge {
+  string from_node_id = 1;        // 源节点ID
+  string to_node_id = 2;          // 目标节点ID
+  string call_type = 3;           // 调用类型（direct, indirect, conditional）
+  int32 call_count = 4;           // 调用次数
+  repeated int32 call_lines = 5;  // 调用行号列表
+}
+
+// 查询调用路径请求
+message QueryCallPathRequest {
+  string source_function = 1;     // 源函数
+  string target_function = 2;     // 目标函数
+  int32 max_paths = 3;            // 最多返回路径数
+}
+
+// 查询调用路径响应
+message QueryCallPathResponse {
+  repeated CallPath paths = 1;    // 调用路径列表
+  int32 total_paths = 2;          // 总路径数
+  bool path_exists = 3;           // 是否存在路径
+}
+
+// 调用路径
+message CallPath {
+  int32 path_index = 1;           // 路径序号
+  repeated CallGraphNode nodes = 2; // 路径节点
+  int32 path_length = 3;          // 路径长度
+}
+
+// 查询调用深度请求
+message QueryCallDepthRequest {
+  string function_name = 1;       // 函数名
+  string direction = 2;           // 方向（incoming, outgoing, both）
+}
+
+// 查询调用深度响应
+message QueryCallDepthResponse {
+  int32 incoming_depth = 1;       // 传入调用深度
+  int32 outgoing_depth = 2;       // 传出调用深度
+  int32 max_depth = 3;            // 最大深度
+  repeated DepthLevel levels = 4; // 深度级别信息
+}
+
+// 深度级别信息
+message DepthLevel {
+  int32 level = 1;                // 级别
+  repeated string functions = 2;  // 该级别的函数
+}
+
+// 分析循环调用请求
+message AnalyzeCyclesRequest {
+  string start_function = 1;      // 起始函数
+  int32 max_cycle_length = 2;     // 最大循环长度
+}
+
+// 分析循环调用响应
+message AnalyzeCyclesResponse {
+  bool has_cycles = 1;            // 是否存在循环
+  repeated CallCycle cycles = 2;  // 循环列表
+  int32 total_cycles = 3;         // 循环总数
+}
+
+// 调用循环
+message CallCycle {
+  int32 cycle_id = 1;             // 循环ID
+  repeated string functions = 2;  // 循环涉及的函数
+  int32 cycle_length = 3;         // 循环长度
+  repeated int32 lines = 4;       // 关键行号
+}
+
+// 查询死代码请求
+message FindDeadCodeRequest {
+  string file_path = 1;           // 文件路径
+  repeated string entry_points = 2; // 入口点
+  bool include_tests = 3;         // 是否包含测试代码
+}
+
+// 查询死代码响应
+message FindDeadCodeResponse {
+  repeated DeadCodeInfo dead_functions = 1; // 死代码函数
+  int32 total_dead_count = 2;     // 死代码总数
+}
+
+// 死代码信息
+message DeadCodeInfo {
+  string function_name = 1;       // 函数名
+  string file_path = 2;           // 文件路径
+  int32 start_line = 3;           // 起始行
+  int32 end_line = 4;             // 结束行
+  int32 line_count = 5;           // 代码行数
+  double complexity = 6;          // 复杂度
+  string reason = 7;              // 死代码原因
+}
+
+// 调用链分析结果
+message CallChainAnalysisResult {
+  string result_id = 1;           // 结果ID
+  CallGraphNode entry_node = 2;   // 入口节点
+  repeated CallPath all_paths = 3; // 所有路径
+  int32 total_calls = 4;          // 总调用数
+  int32 unique_functions = 5;     // 唯一函数数
+  repeated string critical_functions = 6; // 关键函数
+}

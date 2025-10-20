@@ -1,0 +1,90 @@
+name: "Cross-Site Scripting (XSS) Detection"
+id: "xss"
+category: "injection"
+severity: "high"
+description: "检测潜在的跨站脚本攻击漏洞"
+language: ["javascript", "typescript", "python"]
+
+patterns:
+  # 直接输出用户输入到HTML
+  - pattern: |
+      .*\.innerHTML\s*=.*
+    message: "直接设置innerHTML可能导致XSS攻击"
+    severity: "high"
+    language: ["javascript", "typescript"]
+    
+  - pattern: |
+      .*\.outerHTML\s*=.*
+    message: "直接设置outerHTML可能导致XSS攻击"
+    severity: "high"
+    language: ["javascript", "typescript"]
+    
+  - pattern: |
+      document\.write\(.*\)
+    message: "使用document.write()可能导致XSS攻击"
+    severity: "high"
+    language: ["javascript", "typescript"]
+
+  # 危险的HTML生成
+  - pattern: |
+      .*\+.*"<.*>.*".*\+.*
+    message: "字符串拼接生成HTML，可能存在XSS风险"
+    severity: "medium"
+    
+  - pattern: |
+      `<.*\$\{.*\}.*>`
+    message: "模板字符串生成HTML，可能存在XSS风险"
+    severity: "medium"
+    language: ["javascript", "typescript"]
+
+  # Python特定模式
+  - pattern: |
+      .*\.format\(.*\).*"<.*>.*"
+    message: "使用字符串格式化生成HTML，可能存在XSS风险"
+    severity: "medium"
+    language: ["python"]
+    
+  - pattern: |
+      render_template_string\(.*\)
+    message: "动态渲染模板字符串，可能存在XSS风险"
+    severity: "high"
+    language: ["python"]
+
+safe_patterns:
+  # 安全的DOM操作
+  - pattern: |
+      .*\.textContent\s*=.*
+    message: "使用textContent是安全的"
+    language: ["javascript", "typescript"]
+    
+  - pattern: |
+      .*\.innerText\s*=.*
+    message: "使用innerText是安全的"
+    language: ["javascript", "typescript"]
+
+examples:
+  vulnerable:
+    - |
+      // 危险：直接设置innerHTML
+      element.innerHTML = userInput;
+    - |
+      // 危险：字符串拼接HTML
+      const html = "<div>" + userContent + "</div>";
+    - |
+      // 危险：模板字符串
+      element.innerHTML = `<span>${userName}</span>`;
+    - |
+      # 危险：Python模板渲染
+      return render_template_string("<h1>Hello " + username + "</h1>")
+      
+  safe:
+    - |
+      // 安全：使用textContent
+      element.textContent = userInput;
+    - |
+      // 安全：使用DOM API
+      const span = document.createElement('span');
+      span.textContent = userName;
+    - |
+      # 安全：使用模板引擎转义
+      return render_template('template.html', username=username)

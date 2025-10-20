@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v6.33.0
-// source: ast_parser.proto
+// source: proto/ast_parser.proto
 
 package proto
 
@@ -167,5 +167,233 @@ var ASTParser_ServiceDesc = grpc.ServiceDesc{
 			ServerStreams: true,
 		},
 	},
-	Metadata: "ast_parser.proto",
+	Metadata: "proto/ast_parser.proto",
+}
+
+const (
+	VulnerabilityDetector_ScanFile_FullMethodName    = "/codeaudit.VulnerabilityDetector/ScanFile"
+	VulnerabilityDetector_ScanBatch_FullMethodName   = "/codeaudit.VulnerabilityDetector/ScanBatch"
+	VulnerabilityDetector_GetRules_FullMethodName    = "/codeaudit.VulnerabilityDetector/GetRules"
+	VulnerabilityDetector_GetRuleById_FullMethodName = "/codeaudit.VulnerabilityDetector/GetRuleById"
+)
+
+// VulnerabilityDetectorClient is the client API for VulnerabilityDetector service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+//
+// 漏洞检测服务
+type VulnerabilityDetectorClient interface {
+	// 扫描单个文件
+	ScanFile(ctx context.Context, in *ScanFileRequest, opts ...grpc.CallOption) (*ScanFileResponse, error)
+	// 批量扫描文件
+	ScanBatch(ctx context.Context, in *ScanBatchRequest, opts ...grpc.CallOption) (*ScanBatchResponse, error)
+	// 获取所有规则
+	GetRules(ctx context.Context, in *GetRulesRequest, opts ...grpc.CallOption) (*GetRulesResponse, error)
+	// 根据ID获取规则
+	GetRuleById(ctx context.Context, in *GetRuleByIdRequest, opts ...grpc.CallOption) (*GetRuleByIdResponse, error)
+}
+
+type vulnerabilityDetectorClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewVulnerabilityDetectorClient(cc grpc.ClientConnInterface) VulnerabilityDetectorClient {
+	return &vulnerabilityDetectorClient{cc}
+}
+
+func (c *vulnerabilityDetectorClient) ScanFile(ctx context.Context, in *ScanFileRequest, opts ...grpc.CallOption) (*ScanFileResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ScanFileResponse)
+	err := c.cc.Invoke(ctx, VulnerabilityDetector_ScanFile_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *vulnerabilityDetectorClient) ScanBatch(ctx context.Context, in *ScanBatchRequest, opts ...grpc.CallOption) (*ScanBatchResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ScanBatchResponse)
+	err := c.cc.Invoke(ctx, VulnerabilityDetector_ScanBatch_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *vulnerabilityDetectorClient) GetRules(ctx context.Context, in *GetRulesRequest, opts ...grpc.CallOption) (*GetRulesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetRulesResponse)
+	err := c.cc.Invoke(ctx, VulnerabilityDetector_GetRules_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *vulnerabilityDetectorClient) GetRuleById(ctx context.Context, in *GetRuleByIdRequest, opts ...grpc.CallOption) (*GetRuleByIdResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetRuleByIdResponse)
+	err := c.cc.Invoke(ctx, VulnerabilityDetector_GetRuleById_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// VulnerabilityDetectorServer is the server API for VulnerabilityDetector service.
+// All implementations must embed UnimplementedVulnerabilityDetectorServer
+// for forward compatibility.
+//
+// 漏洞检测服务
+type VulnerabilityDetectorServer interface {
+	// 扫描单个文件
+	ScanFile(context.Context, *ScanFileRequest) (*ScanFileResponse, error)
+	// 批量扫描文件
+	ScanBatch(context.Context, *ScanBatchRequest) (*ScanBatchResponse, error)
+	// 获取所有规则
+	GetRules(context.Context, *GetRulesRequest) (*GetRulesResponse, error)
+	// 根据ID获取规则
+	GetRuleById(context.Context, *GetRuleByIdRequest) (*GetRuleByIdResponse, error)
+	mustEmbedUnimplementedVulnerabilityDetectorServer()
+}
+
+// UnimplementedVulnerabilityDetectorServer must be embedded to have
+// forward compatible implementations.
+//
+// NOTE: this should be embedded by value instead of pointer to avoid a nil
+// pointer dereference when methods are called.
+type UnimplementedVulnerabilityDetectorServer struct{}
+
+func (UnimplementedVulnerabilityDetectorServer) ScanFile(context.Context, *ScanFileRequest) (*ScanFileResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ScanFile not implemented")
+}
+func (UnimplementedVulnerabilityDetectorServer) ScanBatch(context.Context, *ScanBatchRequest) (*ScanBatchResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ScanBatch not implemented")
+}
+func (UnimplementedVulnerabilityDetectorServer) GetRules(context.Context, *GetRulesRequest) (*GetRulesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetRules not implemented")
+}
+func (UnimplementedVulnerabilityDetectorServer) GetRuleById(context.Context, *GetRuleByIdRequest) (*GetRuleByIdResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetRuleById not implemented")
+}
+func (UnimplementedVulnerabilityDetectorServer) mustEmbedUnimplementedVulnerabilityDetectorServer() {}
+func (UnimplementedVulnerabilityDetectorServer) testEmbeddedByValue()                               {}
+
+// UnsafeVulnerabilityDetectorServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to VulnerabilityDetectorServer will
+// result in compilation errors.
+type UnsafeVulnerabilityDetectorServer interface {
+	mustEmbedUnimplementedVulnerabilityDetectorServer()
+}
+
+func RegisterVulnerabilityDetectorServer(s grpc.ServiceRegistrar, srv VulnerabilityDetectorServer) {
+	// If the following call pancis, it indicates UnimplementedVulnerabilityDetectorServer was
+	// embedded by pointer and is nil.  This will cause panics if an
+	// unimplemented method is ever invoked, so we test this at initialization
+	// time to prevent it from happening at runtime later due to I/O.
+	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
+		t.testEmbeddedByValue()
+	}
+	s.RegisterService(&VulnerabilityDetector_ServiceDesc, srv)
+}
+
+func _VulnerabilityDetector_ScanFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ScanFileRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VulnerabilityDetectorServer).ScanFile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VulnerabilityDetector_ScanFile_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VulnerabilityDetectorServer).ScanFile(ctx, req.(*ScanFileRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VulnerabilityDetector_ScanBatch_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ScanBatchRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VulnerabilityDetectorServer).ScanBatch(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VulnerabilityDetector_ScanBatch_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VulnerabilityDetectorServer).ScanBatch(ctx, req.(*ScanBatchRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VulnerabilityDetector_GetRules_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetRulesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VulnerabilityDetectorServer).GetRules(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VulnerabilityDetector_GetRules_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VulnerabilityDetectorServer).GetRules(ctx, req.(*GetRulesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VulnerabilityDetector_GetRuleById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetRuleByIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VulnerabilityDetectorServer).GetRuleById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VulnerabilityDetector_GetRuleById_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VulnerabilityDetectorServer).GetRuleById(ctx, req.(*GetRuleByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// VulnerabilityDetector_ServiceDesc is the grpc.ServiceDesc for VulnerabilityDetector service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var VulnerabilityDetector_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "codeaudit.VulnerabilityDetector",
+	HandlerType: (*VulnerabilityDetectorServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "ScanFile",
+			Handler:    _VulnerabilityDetector_ScanFile_Handler,
+		},
+		{
+			MethodName: "ScanBatch",
+			Handler:    _VulnerabilityDetector_ScanBatch_Handler,
+		},
+		{
+			MethodName: "GetRules",
+			Handler:    _VulnerabilityDetector_GetRules_Handler,
+		},
+		{
+			MethodName: "GetRuleById",
+			Handler:    _VulnerabilityDetector_GetRuleById_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "proto/ast_parser.proto",
 }

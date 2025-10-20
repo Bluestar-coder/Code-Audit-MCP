@@ -12,6 +12,7 @@ const (
 	LanguageGo         Language = "go"
 	LanguagePython     Language = "python"
 	LanguageJavaScript Language = "javascript"
+	LanguageTypeScript Language = "typescript"
 	LanguageJava       Language = "java"
 	LanguagePHP        Language = "php"
 	LanguageC          Language = "c"
@@ -136,8 +137,10 @@ func DetectLanguage(filePath string) Language {
 		return LanguageGo
 	case hasExtension(filePath, ".py", ".pyw"):
 		return LanguagePython
-	case hasExtension(filePath, ".js", ".jsx", ".ts", ".tsx"):
+	case hasExtension(filePath, ".js", ".jsx"):
 		return LanguageJavaScript
+	case hasExtension(filePath, ".ts", ".tsx"):
+		return LanguageTypeScript
 	case hasExtension(filePath, ".java"):
 		return LanguageJava
 	case hasExtension(filePath, ".php"):

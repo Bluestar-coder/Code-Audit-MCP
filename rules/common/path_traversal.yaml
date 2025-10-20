@@ -1,0 +1,94 @@
+name: "Path Traversal Detection"
+id: "path_traversal"
+category: "file_access"
+severity: "high"
+description: "检测潜在的路径遍历漏洞"
+language: ["javascript", "typescript", "python", "go"]
+
+patterns:
+  # 直接使用用户输入构建文件路径
+  - pattern: |
+      .*\.readFile\(.*\+.*\)
+    message: "使用字符串拼接构建文件路径，可能存在路径遍历风险"
+    severity: "high"
+    language: ["javascript", "typescript"]
+    
+  - pattern: |
+      fs\.readFileSync\(.*\+.*\)
+    message: "使用字符串拼接构建文件路径，可能存在路径遍历风险"
+    severity: "high"
+    language: ["javascript", "typescript"]
+    
+  - pattern: |
+      path\.join\(.*,.*\)
+    message: "使用path.join()时需要验证用户输入，防止路径遍历"
+    severity: "medium"
+    language: ["javascript", "typescript"]
+
+  # Python特定模式
+  - pattern: |
+      open\(.*\+.*\)
+    message: "使用字符串拼接构建文件路径，可能存在路径遍历风险"
+    severity: "high"
+    language: ["python"]
+    
+  - pattern: |
+      os\.path\.join\(.*,.*\)
+    message: "使用os.path.join()时需要验证用户输入，防止路径遍历"
+    severity: "medium"
+    language: ["python"]
+
+  # 危险的路径模式
+  - pattern: |
+      .*\.\./.*
+    message: "检测到相对路径遍历模式 '../'"
+    severity: "high"
+    
+  - pattern: |
+      .*\.\.\\.*
+    message: "检测到相对路径遍历模式 '..\\'"
+    severity: "high"
+
+safe_patterns:
+  # 安全的路径处理
+  - pattern: |
+      path\.resolve\(.*\)
+    message: "使用path.resolve()进行路径解析"
+    language: ["javascript", "typescript"]
+    
+  - pattern: |
+      os\.path\.abspath\(.*\)
+    message: "使用os.path.abspath()获取绝对路径"
+    language: ["python"]
+
+examples:
+  vulnerable:
+    - |
+      // 危险：直接拼接用户输入
+      const filePath = "/uploads/" + userFileName;
+      fs.readFile(filePath, callback);
+    - |
+      // 危险：可能的路径遍历
+      const content = fs.readFileSync("./files/" + req.params.filename);
+    - |
+      # 危险：Python文件读取
+      with open("/var/www/" + user_file) as f:
+          content = f.read()
+    - |
+      // 危险：包含遍历字符
+      const maliciousPath = "../../../etc/passwd";
+      
+  safe:
+    - |
+      // 安全：路径验证和解析
+      const safePath = path.resolve(baseDir, userFileName);
+      if (!safePath.startsWith(baseDir)) {
+          throw new Error("Invalid path");
+      }
+      fs.readFile(safePath, callback);
+    - |
+      # 安全：Python路径验证
+      safe_path = os.path.join(base_dir, user_file)
+      safe_path = os.path.abspath(safe_path)
+      if not safe_path.startswith(base_dir):
+          raise ValueError("Invalid path")
