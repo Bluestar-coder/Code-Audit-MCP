@@ -19,7 +19,7 @@ func (ccs *CallChainService) QueryCallPath(ctx context.Context, req *pb.QueryCal
 	
 	// 在所有调用图中查找路径
 	for _, graph := range ccs.callGraphs {
-		paths := ccs.findPathsBetweenFunctions(graph, req.SourceFunction, req.TargetFunction, int(req.MaxDepth))
+		paths := ccs.findPathsBetweenFunctions(graph, req.SourceFunction, req.TargetFunction, 10)
 		allPaths = append(allPaths, paths...)
 	}
 	
@@ -206,13 +206,13 @@ func (ccs *CallChainService) QueryCallDepth(ctx context.Context, req *pb.QueryCa
 	var levels []*pb.DepthLevel
 	
 	if req.Direction == "incoming" || req.Direction == "both" {
-		incomingLevels := ccs.calculateIncomingDepth(graph, targetNode, int(req.MaxDepth))
+		incomingLevels := ccs.calculateIncomingDepth(graph, targetNode, 10)
 		incomingDepth = int32(len(incomingLevels))
 		levels = append(levels, incomingLevels...)
 	}
 	
 	if req.Direction == "outgoing" || req.Direction == "both" {
-		outgoingLevels := ccs.calculateOutgoingDepth(graph, targetNode, int(req.MaxDepth))
+		outgoingLevels := ccs.calculateOutgoingDepth(graph, targetNode, 10)
 		outgoingDepth = int32(len(outgoingLevels))
 		levels = append(levels, outgoingLevels...)
 	}
@@ -229,6 +229,7 @@ func (ccs *CallChainService) QueryCallDepth(ctx context.Context, req *pb.QueryCa
 		Levels:        levels,
 	}, nil
 }
+
 
 // calculateIncomingDepth 计算入向深度
 func (ccs *CallChainService) calculateIncomingDepth(graph *CallGraph, target *CallGraphNode, maxDepth int) []*pb.DepthLevel {

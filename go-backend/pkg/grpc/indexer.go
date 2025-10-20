@@ -4,8 +4,8 @@ import (
 	"context"
 	"log"
 
-	"github.com/codeaudit/internal/indexer"
-	pb "github.com/codeaudit/proto"
+	"code-audit-mcp/internal/indexer"
+	pb "code-audit-mcp/proto"
 )
 
 // IndexerService 实现索引服务

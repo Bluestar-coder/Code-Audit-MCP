@@ -1,10 +1,8 @@
 package indexer
 
 import (
-	"encoding/json"
 	"fmt"
 	"regexp"
-	"strconv"
 	"strings"
 	"time"
 )

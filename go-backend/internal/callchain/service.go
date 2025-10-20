@@ -501,7 +501,7 @@ func (ccs *CallChainService) saveCallGraphToDB(graph *CallGraph) error {
 		}
 		
 		// 保存边
-		for sourceID, edges := range graph.Edges {
+		for _, edges := range graph.Edges {
 			for _, edge := range edges {
 				edgeKey := fmt.Sprintf("edge:%s:%s", graph.ID, edge.ID)
 				edgeData := fmt.Sprintf("%s|%s|%s|%s|%d|%f",
