@@ -4,178 +4,241 @@ import (
 	"context"
 	"log"
 
-	pb "code-audit-mcp/proto"
+	"github.com/codeaudit/internal/indexer"
+	pb "github.com/codeaudit/proto"
 )
 
-// IndexerService implements pb.IndexerServer
+// IndexerService 实现索引服务
 type IndexerService struct {
 	pb.UnimplementedIndexerServer
+	service *indexer.IndexerService
 }
 
-// NewIndexerService creates a new indexer service
-func NewIndexerService() *IndexerService {
-	return &IndexerService{}
-}
-
-// BuildIndex implements pb.Indexer/BuildIndex
-func (s *IndexerService) BuildIndex(ctx context.Context, req *pb.BuildIndexRequest) (*pb.BuildIndexResponse, error) {
-	log.Printf("🔨 Building index for: %s", req.FilePath)
-
-	// TODO: Implement actual indexing logic using BadgerDB
-
-	resp := &pb.BuildIndexResponse{
-		Success:          true,
-		IndexId:          "idx_" + req.FilePath,
-		FunctionsIndexed: 10,
-		ClassesIndexed:   5,
-		VariablesIndexed: 50,
-		ErrorMessage:     "",
+// NewIndexerService 创建新的索引服务
+func NewIndexerService(dbPath string) (*IndexerService, error) {
+	service, err := indexer.NewIndexerService(dbPath)
+	if err != nil {
+		return nil, err
 	}
-
-	return resp, nil
+	
+	return &IndexerService{
+		service: service,
+	}, nil
 }
 
-// QueryFunction implements pb.Indexer/QueryFunction
+// Close 关闭服务
+func (s *IndexerService) Close() error {
+	if s.service != nil {
+		return s.service.Close()
+	}
+	return nil
+}
+
+// BuildIndex 构建代码索引
+func (s *IndexerService) BuildIndex(ctx context.Context, req *pb.BuildIndexRequest) (*pb.BuildIndexResponse, error) {
+	log.Printf("🔨 Building index for file: %s (language: %s)", req.FilePath, req.Language)
+	
+	result, err := s.service.BuildIndex(req.FilePath, req.Language, req.AstData, req.Incremental)
+	if err != nil {
+		return &pb.BuildIndexResponse{
+			Success: false,
+			Message: err.Error(),
+		}, nil
+	}
+	
+	return &pb.BuildIndexResponse{
+		Success: result.Success,
+		IndexId: result.IndexID,
+		Message: "Index built successfully",
+		Stats: &pb.IndexStats{
+			FunctionsIndexed: int32(result.FunctionsIndexed),
+			ClassesIndexed:   int32(result.ClassesIndexed),
+			VariablesIndexed: int32(result.VariablesIndexed),
+		},
+	}, nil
+}
+
+// QueryFunction 查询函数信息
 func (s *IndexerService) QueryFunction(ctx context.Context, req *pb.QueryFunctionRequest) (*pb.QueryFunctionResponse, error) {
 	log.Printf("🔍 Querying function: %s", req.FunctionName)
-
-	// TODO: Implement actual function query logic
-
-	functions := []*pb.FunctionInfo{
-		{
-			Id:                   "func_1",
-			Name:                 req.FunctionName,
-			FilePath:             "/path/to/file.go",
-			StartLine:            10,
-			EndLine:              25,
-			Signature:            "func example() error",
-			CyclomaticComplexity: 3,
-			Parameters:           []string{"ctx", "data"},
-			ReturnType:           "error",
-		},
+	
+	queryReq := &indexer.QueryFunctionRequest{
+		FunctionName: req.FunctionName,
+		FilePath:     req.FilePath,
+		ExactMatch:   req.ExactMatch,
 	}
-
-	resp := &pb.QueryFunctionResponse{
-		Functions:  functions,
-		TotalCount: int32(len(functions)),
+	
+	result, err := s.service.QueryFunction(queryReq)
+	if err != nil {
+		return &pb.QueryFunctionResponse{}, err
 	}
-
-	return resp, nil
+	
+	var functions []*pb.FunctionInfo
+	for _, fn := range result.Functions {
+		var params []*pb.Parameter
+		for _, param := range fn.Parameters {
+			params = append(params, &pb.Parameter{
+				Name: param.Name,
+				Type: param.Type,
+			})
+		}
+		
+		functions = append(functions, &pb.FunctionInfo{
+			Name:       fn.Name,
+			FilePath:   fn.FilePath,
+			StartLine:  int32(fn.StartLine),
+			EndLine:    int32(fn.EndLine),
+			Signature:  fn.Signature,
+			Parameters: params,
+			ReturnType: fn.ReturnType,
+		})
+	}
+	
+	return &pb.QueryFunctionResponse{
+		Functions: functions,
+	}, nil
 }
 
-// QueryClass implements pb.Indexer/QueryClass
+// QueryClass 查询类信息
 func (s *IndexerService) QueryClass(ctx context.Context, req *pb.QueryClassRequest) (*pb.QueryClassResponse, error) {
-	log.Printf("🏛️ Querying class: %s", req.ClassName)
-
-	// TODO: Implement actual class query logic
-
-	classes := []*pb.ClassInfo{
-		{
-			Id:         "class_1",
-			Name:       req.ClassName,
-			FilePath:   "/path/to/file.java",
-			StartLine:  5,
-			EndLine:    100,
-			BaseClass:  "BaseClass",
-			Interfaces: []string{"Interface1", "Interface2"},
-			Methods: []*pb.MethodInfo{
-				{
-					Id:         "method_1",
-					Name:       "getData",
-					IsStatic:   false,
-					IsPrivate:  false,
-					ReturnType: "String",
-				},
-			},
-			Fields: []string{"id", "name", "data"},
-		},
+	log.Printf("🔍 Querying class: %s", req.ClassName)
+	
+	queryReq := &indexer.QueryClassRequest{
+		ClassName:  req.ClassName,
+		FilePath:   req.FilePath,
+		ExactMatch: req.ExactMatch,
 	}
-
-	resp := &pb.QueryClassResponse{
-		Classes:    classes,
-		TotalCount: int32(len(classes)),
+	
+	result, err := s.service.QueryClass(queryReq)
+	if err != nil {
+		return &pb.QueryClassResponse{}, err
 	}
-
-	return resp, nil
+	
+	var classes []*pb.ClassInfo
+	for _, cls := range result.Classes {
+		var methods []*pb.MethodInfo
+		for _, method := range cls.Methods {
+			var params []*pb.Parameter
+			for _, param := range method.Parameters {
+				params = append(params, &pb.Parameter{
+					Name: param.Name,
+					Type: param.Type,
+				})
+			}
+			
+			methods = append(methods, &pb.MethodInfo{
+				Name:       method.Name,
+				StartLine:  int32(method.StartLine),
+				EndLine:    int32(method.EndLine),
+				Signature:  method.Signature,
+				Parameters: params,
+				ReturnType: method.ReturnType,
+			})
+		}
+		
+		classes = append(classes, &pb.ClassInfo{
+			Name:      cls.Name,
+			FilePath:  cls.FilePath,
+			StartLine: int32(cls.StartLine),
+			EndLine:   int32(cls.EndLine),
+			Methods:   methods,
+		})
+	}
+	
+	return &pb.QueryClassResponse{
+		Classes: classes,
+	}, nil
 }
 
-// QueryCallers implements pb.Indexer/QueryCallers
+// QueryCallers 查询调用者
 func (s *IndexerService) QueryCallers(ctx context.Context, req *pb.QueryCallersRequest) (*pb.QueryCallersResponse, error) {
 	log.Printf("☎️ Querying callers for: %s", req.FunctionId)
 
-	// TODO: Implement actual callers query logic
-
-	callers := []*pb.CallInfo{
-		{
-			CallerId:   "func_caller_1",
-			CallerName: "caller1",
-			CalleeId:   req.FunctionId,
-			CalleeName: "target",
-			CallLine:   25,
-			CallType:   "direct",
-		},
+	queryReq := &indexer.QueryCallersRequest{
+		FunctionID: req.FunctionId,
+		MaxDepth:   int(req.MaxDepth),
 	}
 
-	resp := &pb.QueryCallersResponse{
-		Callers:    callers,
-		TotalCount: int32(len(callers)),
+	result, err := s.service.QueryCallers(queryReq)
+	if err != nil {
+		return &pb.QueryCallersResponse{}, err
 	}
 
-	return resp, nil
+	var callers []*pb.CallInfo
+	for _, call := range result.Callers {
+		callers = append(callers, &pb.CallInfo{
+			CallerId:   call.CallerID,
+			CallerName: call.CallerName,
+			CalleeId:   call.CalleeID,
+			CalleeName: call.CalleeName,
+			CallLine:   int32(call.CallLine),
+			CallType:   call.CallType,
+		})
+	}
+
+	return &pb.QueryCallersResponse{
+		Callers: callers,
+	}, nil
 }
 
-// QueryCallees implements pb.Indexer/QueryCallees
+// QueryCallees 查询被调用者
 func (s *IndexerService) QueryCallees(ctx context.Context, req *pb.QueryCalleesRequest) (*pb.QueryCalleesResponse, error) {
 	log.Printf("📞 Querying callees for: %s", req.FunctionId)
 
-	// TODO: Implement actual callees query logic
-
-	callees := []*pb.CallInfo{
-		{
-			CallerId:   req.FunctionId,
-			CallerName: "source",
-			CalleeId:   "func_callee_1",
-			CalleeName: "callee1",
-			CallLine:   30,
-			CallType:   "direct",
-		},
+	queryReq := &indexer.QueryCalleesRequest{
+		FunctionID: req.FunctionId,
+		MaxDepth:   int(req.MaxDepth),
 	}
 
-	resp := &pb.QueryCalleesResponse{
-		Callees:    callees,
-		TotalCount: int32(len(callees)),
+	result, err := s.service.QueryCallees(queryReq)
+	if err != nil {
+		return &pb.QueryCalleesResponse{}, err
 	}
 
-	return resp, nil
+	var callees []*pb.CallInfo
+	for _, call := range result.Callees {
+		callees = append(callees, &pb.CallInfo{
+			CallerId:   call.CallerID,
+			CallerName: call.CallerName,
+			CalleeId:   call.CalleeID,
+			CalleeName: call.CalleeName,
+			CallLine:   int32(call.CallLine),
+			CallType:   call.CallType,
+		})
+	}
+
+	return &pb.QueryCalleesResponse{
+		Callees: callees,
+	}, nil
 }
 
-// SearchSymbol implements pb.Indexer/SearchSymbol
+// SearchSymbol 搜索符号
 func (s *IndexerService) SearchSymbol(req *pb.SearchSymbolRequest, stream pb.Indexer_SearchSymbolServer) error {
 	log.Printf("🔎 Searching symbols matching: %s", req.Pattern)
 
-	// TODO: Implement actual symbol search logic
-
-	results := []*pb.SearchSymbolResponse{
-		{
-			SymbolId:       "sym_1",
-			SymbolName:     "myFunction",
-			SymbolType:     "function",
-			FilePath:       "/path/to/file.go",
-			LineNumber:     10,
-			RelevanceScore: 0.95,
-		},
-		{
-			SymbolId:       "sym_2",
-			SymbolName:     "myClass",
-			SymbolType:     "class",
-			FilePath:       "/path/to/file.java",
-			LineNumber:     5,
-			RelevanceScore: 0.85,
-		},
+	queryReq := &indexer.SearchSymbolRequest{
+		Pattern:    req.Pattern,
+		SymbolType: req.SymbolType,
+		MaxResults: int(req.MaxResults),
 	}
 
-	for _, result := range results {
-		if err := stream.Send(result); err != nil {
+	result, err := s.service.SearchSymbol(queryReq)
+	if err != nil {
+		return err
+	}
+
+	for _, symbol := range result.Symbols {
+		response := &pb.SearchSymbolResponse{
+			SymbolId:       symbol.SymbolID,
+			SymbolName:     symbol.SymbolName,
+			SymbolType:     symbol.SymbolType,
+			FilePath:       symbol.FilePath,
+			LineNumber:     int32(symbol.LineNumber),
+			RelevanceScore: symbol.RelevanceScore,
+			Context:        symbol.Context,
+		}
+
+		if err := stream.Send(response); err != nil {
 			log.Printf("❌ Error sending search result: %v", err)
 			return err
 		}

@@ -2,6 +2,7 @@
 
 import asyncio
 import logging
+import json
 from typing import Any
 
 import mcp.types as types
@@ -51,6 +52,10 @@ async def list_tools() -> list[types.Tool]:
                     "language": {
                         "type": "string",
                         "description": "Target language for POC",
+                    },
+                    "context": {
+                        "type": "string",
+                        "description": "Optional code context or snippet to guide PoC",
                     },
                 },
                 "required": ["vulnerability_id"],
@@ -128,6 +133,10 @@ async def list_tools() -> list[types.Tool]:
                         "type": "string",
                         "description": "Package version (optional)",
                     },
+                    "ecosystem": {
+                        "type": "string",
+                        "description": "Package ecosystem (e.g., Go, PyPI, npm)",
+                    },
                 },
                 "required": ["package_name"],
             },
@@ -141,91 +150,54 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[types.TextCont
     logger.info(f"Tool called: {name} with arguments: {arguments}")
 
     if name == "scan_code":
+        from .tools import CodeScanner
         path = arguments.get("path")
-        return [
-            types.TextContent(
-                type="text",
-                text=f"Scanning {path}... (Not implemented yet)\n"
-                "This tool will:\n"
-                "1. Parse code files\n"
-                "2. Analyze vulnerabilities\n"
-                "3. Generate detailed report",
-            )
-        ]
+        language = arguments.get("language")
+        async with CodeScanner() as tool:
+            result = await tool.execute(path=path, language=language)
+        return [types.TextContent(type="text", text=json.dumps(result, ensure_ascii=False, indent=2))]
 
     elif name == "generate_poc":
+        from .tools import POCGenerator
         vuln_id = arguments.get("vulnerability_id")
         language = arguments.get("language", "python")
-        return [
-            types.TextContent(
-                type="text",
-                text=f"Generating POC for vulnerability {vuln_id} in {language}...\n"
-                "(Not implemented yet)\n"
-                "POC will include:\n"
-                "- Vulnerability verification code\n"
-                "- Setup instructions\n"
-                "- Expected output",
-            )
-        ]
+        context = arguments.get("context")
+        async with POCGenerator() as tool:
+            result = await tool.execute(vulnerability_id=vuln_id, language=language, context=context)
+        return [types.TextContent(type="text", text=json.dumps(result, ensure_ascii=False, indent=2))]
 
     elif name == "analyze_call_graph":
+        from .tools import CallGraphAnalyzer
         path = arguments.get("path")
-        return [
-            types.TextContent(
-                type="text",
-                text=f"Analyzing call graph for {path}...\n"
-                "(Not implemented yet)\n"
-                "This will generate:\n"
-                "- Function call chains\n"
-                "- Dependency graph\n"
-                "- Unused functions analysis",
-            )
-        ]
+        entry_point = arguments.get("entry_point")
+        async with CallGraphAnalyzer() as tool:
+            result = await tool.execute(path=path, entry_point=entry_point)
+        return [types.TextContent(type="text", text=json.dumps(result, ensure_ascii=False, indent=2))]
 
     elif name == "trace_taint":
-        file_path = arguments.get("file_path")
+        from .tools import TaintTracer
         source = arguments.get("source")
         sink = arguments.get("sink")
-        return [
-            types.TextContent(
-                type="text",
-                text=f"Tracing taint from {source} to {sink} in {file_path}...\n"
-                "(Not implemented yet)\n"
-                "Will trace:\n"
-                "- Data flow path\n"
-                "- Transformations\n"
-                "- Sanitizers (if any)",
-            )
-        ]
+        async with TaintTracer() as tool:
+            result = await tool.execute(source=source, sink=sink)
+        return [types.TextContent(type="text", text=json.dumps(result, ensure_ascii=False, indent=2))]
 
     elif name == "explain_code":
+        from .tools import CodeExplainer
         code = arguments.get("code")
-        return [
-            types.TextContent(
-                type="text",
-                text=f"Explaining code snippet...\n"
-                "(Not implemented yet)\n"
-                "AI will provide:\n"
-                "- Code purpose\n"
-                "- Potential issues\n"
-                "- Security concerns",
-            )
-        ]
+        language = arguments.get("language", "")
+        async with CodeExplainer() as tool:
+            result = await tool.execute(code=code, language=language)
+        return [types.TextContent(type="text", text=json.dumps(result, ensure_ascii=False, indent=2))]
 
     elif name == "search_vulnerabilities":
+        from .tools import VulnerabilitySearcher
         package = arguments.get("package_name")
         version = arguments.get("version", "latest")
-        return [
-            types.TextContent(
-                type="text",
-                text=f"Searching for vulnerabilities in {package}@{version}...\n"
-                "(Not implemented yet)\n"
-                "Results will include:\n"
-                "- CVE information\n"
-                "- Severity levels\n"
-                "- Fix recommendations",
-            )
-        ]
+        ecosystem = arguments.get("ecosystem")
+        async with VulnerabilitySearcher() as tool:
+            result = await tool.execute(package_name=package, version=version, ecosystem=ecosystem)
+        return [types.TextContent(type="text", text=json.dumps(result, ensure_ascii=False, indent=2))]
 
     else:
         raise ValueError(f"Unknown tool: {name}")

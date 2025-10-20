@@ -39,9 +39,22 @@ func main() {
 	// 创建服务实例
 	log.Println("📋 Initializing gRPC services...")
 	parserService := grpcpkg.NewASTParserService()
-	indexerService := grpcpkg.NewIndexerService()
+	
+	// 初始化需要数据库的服务
+	dbPath := "./data/audit.db"
+	indexerService, err := grpcpkg.NewIndexerService(dbPath)
+	if err != nil {
+		log.Fatalf("Failed to initialize indexer service: %v", err)
+	}
+	defer indexerService.Close()
+	
 	taintService := grpcpkg.NewTaintAnalyzerService()
-	callChainService := grpcpkg.NewCallChainAnalyzerService()
+	
+	callChainService, err := grpcpkg.NewCallChainAnalyzerService(dbPath)
+	if err != nil {
+		log.Fatalf("Failed to initialize call chain service: %v", err)
+	}
+	defer callChainService.Close()
 	
 	// 初始化漏洞检测服务
 	vulnerabilityService, err := rules.NewService()
