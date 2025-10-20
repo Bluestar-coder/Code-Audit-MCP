@@ -41,6 +41,7 @@ import {
   Folder,
   Description,
 } from '@mui/icons-material';
+import { scanFile, ScanFileRequest } from '../api/client';
 
 interface AnalysisResult {
   id: string;
@@ -101,88 +102,71 @@ const CodeAnalysis: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<AnalysisResult[]>([]);
   const [tabValue, setTabValue] = useState(0);
-
-  // 模拟分析结果
-  const mockResults: AnalysisResult[] = [
-    {
-      id: '1',
-      file: 'src/handlers/user.go',
-      language: 'go',
-      timestamp: new Date().toISOString(),
-      issues: [
-        {
-          type: 'vulnerability',
-          severity: 'critical',
-          rule: 'sql-injection',
-          message: '潜在的SQL注入漏洞：直接拼接用户输入到SQL查询中',
-          line: 45,
-          column: 12,
-        },
-        {
-          type: 'security_hotspot',
-          severity: 'major',
-          rule: 'hardcoded-credentials',
-          message: '硬编码的敏感信息',
-          line: 23,
-        },
-        {
-          type: 'code_smell',
-          severity: 'minor',
-          rule: 'function-complexity',
-          message: '函数复杂度过高，建议重构',
-          line: 78,
-        },
-      ],
-      metrics: {
-        linesOfCode: 234,
-        complexity: 15,
-        duplicatedLines: 12,
-        coverage: 78.5,
-        maintainabilityIndex: 65,
-      },
-    },
-    {
-      id: '2',
-      file: 'src/database/connection.go',
-      language: 'go',
-      timestamp: new Date().toISOString(),
-      issues: [
-        {
-          type: 'bug',
-          severity: 'major',
-          rule: 'resource-leak',
-          message: '数据库连接可能未正确关闭',
-          line: 67,
-        },
-        {
-          type: 'code_smell',
-          severity: 'minor',
-          rule: 'unused-variable',
-          message: '未使用的变量',
-          line: 34,
-        },
-      ],
-      metrics: {
-        linesOfCode: 156,
-        complexity: 8,
-        duplicatedLines: 0,
-        coverage: 85.2,
-        maintainabilityIndex: 72,
-      },
-    },
-  ];
+  const [codeContent, setCodeContent] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
   const handleAnalyze = async () => {
-    if (!projectPath) {
+    if (!projectPath && !codeContent.trim()) {
+      setError('请填写文件路径并粘贴要分析的代码内容');
       return;
     }
-
+    setError(null);
     setLoading(true);
-    // 模拟分析过程
-    setTimeout(() => {
-      setResults(mockResults);
+    try {
+      const resp = await scanFile({
+        file_path: projectPath || 'input.txt',
+        language,
+        content: codeContent,
+        rule_ids: []
+      });
+
+      if (!resp.success) {
+        setError(resp.error || '扫描失败');
+        setLoading(false);
+        return;
+      }
+
+      const mapSeverity = (s: string): Issue['severity'] => {
+        switch ((s || '').toLowerCase()) {
+          case 'high':
+            return 'critical';
+          case 'medium':
+            return 'major';
+          case 'low':
+            return 'minor';
+          default:
+            return 'info';
+        }
+      };
+
+      const analysis: AnalysisResult = {
+        id: `${Date.now()}`,
+        file: resp.file_path,
+        language: resp.language || language,
+        timestamp: new Date().toISOString(),
+        issues: (resp.findings || []).map((f: any) => ({
+          type: 'vulnerability',
+          severity: mapSeverity(f.severity),
+          rule: f.rule_name || f.rule_id || 'unknown-rule',
+          message: f.message,
+          line: f.line || 0,
+          column: f.column || undefined,
+        })),
+        metrics: {
+          linesOfCode: codeContent ? codeContent.split('\n').length : 0,
+          complexity: 0,
+          duplicatedLines: 0,
+          coverage: 0,
+          maintainabilityIndex: 0,
+        },
+      };
+
+      setResults([analysis]);
+    } catch (e: any) {
+      setError(e?.message || String(e));
+    } finally {
       setLoading(false);
-    }, 3000);
+    }
   };
 
   const getIssueTypeIcon = (type: string) => {
@@ -233,6 +217,11 @@ const CodeAnalysis: React.FC = () => {
         <Typography variant="h6" gutterBottom>
           分析配置
         </Typography>
+        {error && (
+          <Box sx={{ mb: 2 }}>
+            <Alert severity="error">{error}</Alert>
+          </Box>
+        )}
         
         <Grid container spacing={2} alignItems="center">
           <Grid size={{ xs: 12, md: 4 }}>
@@ -241,7 +230,7 @@ const CodeAnalysis: React.FC = () => {
               label="项目路径"
               value={projectPath}
               onChange={(e) => setProjectPath(e.target.value)}
-              placeholder="/path/to/your/project"
+              placeholder="/path/to/file.go 或 file.ts"
             />
           </Grid>
           
@@ -283,11 +272,23 @@ const CodeAnalysis: React.FC = () => {
               variant="contained"
               startIcon={loading ? <CircularProgress size={20} /> : <PlayArrow />}
               onClick={handleAnalyze}
-              disabled={loading || !projectPath}
+              disabled={loading || !projectPath || !codeContent}
               fullWidth
             >
               {loading ? '分析中...' : '开始分析'}
             </Button>
+          </Grid>
+
+          <Grid size={{ xs: 12 }}>
+            <TextField
+              fullWidth
+              label="代码内容"
+              value={codeContent}
+              onChange={(e) => setCodeContent(e.target.value)}
+              placeholder={"在此粘贴要分析的代码文本"}
+              multiline
+              minRows={8}
+            />
           </Grid>
         </Grid>
       </Paper>

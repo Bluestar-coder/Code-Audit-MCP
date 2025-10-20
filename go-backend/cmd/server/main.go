@@ -13,7 +13,8 @@ import (
 )
 
 var (
-	port = flag.Int("port", 50051, "gRPC server port")
+	port     = flag.Int("port", 50051, "gRPC server port")
+	httpPort = flag.Int("http-port", 8080, "HTTP server port")
 )
 
 func main() {
@@ -67,6 +68,9 @@ func main() {
 	if vulnerabilityService != nil {
 		pb.RegisterVulnerabilityDetectorServer(s, vulnerabilityService)
 		log.Println("  ✅ VulnerabilityDetectorServer registered")
+		// 并行启动 HTTP 网关
+		go startHTTPServer(vulnerabilityService, *httpPort)
+		log.Printf("🌐 HTTP API will listen on :%d\n", *httpPort)
 	}
 
 	log.Printf("🚀 gRPC server listening on :%d\n", *port)
