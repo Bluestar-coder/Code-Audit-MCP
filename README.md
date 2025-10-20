@@ -2,6 +2,37 @@
 
 > 基于AI的自动化代码安全审计工具，支持MCP协议，采用Python+Go混合架构
 
+## 📌 项目状态
+
+**当前阶段**: Phase 0 - 基础设施搭建 🚧  
+**文档完成度**: 100% ✅  
+**代码完成度**: 5% (项目结构已建立)  
+**开始日期**: 2025-10-19  
+**预计完成**: 11周后
+
+### 📚 核心文档
+
+| 文档 | 行数 | 状态 | 描述 |
+|------|------|------|------|
+| [requirements.md](requirements.md) | 644 | ✅ 完成 | 36个功能需求详细说明 |
+| [design.md](design.md) | 5,549 | ✅ 完成 | 完整系统设计（19章） |
+| [implementation_plan.md](implementation_plan.md) | 1,200+ | ✅ 完成 | 11周实施计划（5阶段） |
+| [QUICK_START.md](QUICK_START.md) | 600+ | ✅ 完成 | 快速开始指南 |
+| [PROJECT_SUMMARY.md](PROJECT_SUMMARY.md) | 800+ | ✅ 完成 | 项目总结报告 |
+
+### 🎯 本周任务 (Phase 0)
+
+- [x] 创建项目结构
+- [x] 完成核心文档
+- [ ] 定义 Protocol Buffers (2天)
+- [ ] 实现 Go gRPC 服务器 (2天)
+- [ ] 实现 Python gRPC 客户端 (2天)
+- [ ] 端到端通信测试 (1天)
+
+**快速开始**: 阅读 [QUICK_START.md](QUICK_START.md) 了解详情
+
+---
+
 ## 🎯 项目简介
 
 本项目是一个智能化的代码安全审计系统，通过深度代码分析、污点追踪、多模型验证等技术，准确识别安全漏洞，并自动生成POC和EXP代码。系统基于MCP（Model Context Protocol）协议实现，可与Claude Desktop等AI客户端无缝集成。
