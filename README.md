@@ -61,6 +61,52 @@ $Env:CLAUDE_MODEL="claude-3-5-sonnet-latest"   # 可选
 - OSV 查询超时：检查网络或稍后重试；失败时会返回错误说明
 - AI 未启用：未设置 `ANTHROPIC_API_KEY` 时将启发式回退，不影响基本功能
 
+## Claude Desktop 配置
+将以下片段添加到 Claude Desktop 的配置（`mcpServers`）中：
+```json
+{
+  "mcpServers": {
+    "code-audit-mcp": {
+      "command": "python",
+      "args": ["-m", "code_audit_mcp.server"],
+      "env": {
+        "ANTHROPIC_API_KEY": "${ANTHROPIC_API_KEY}",
+        "CLAUDE_MODEL": "claude-3-5-sonnet-latest"
+      }
+    }
+  }
+}
+```
+说明：
+- `command` 与 `args` 指向 MCP 服务器入口。
+- gRPC 连接默认 `localhost:50051`，可在 Go 后端启动时自定义端口。
+- AI 未配置时将回退到启发式解释与占位 PoC。
+
+## 端到端示例
+### 1) 代码扫描 / 调用图 / 污点
+确保 Go 后端已启动后运行：
+```
+cd python-mcp/src
+python test_scan.py
+python test_call_graph.py
+python test_taint.py
+```
+示例输出（截断）：
+```
+{"path":"E:\\Code\\CodeAuditMcp\\go-backend\\internal\\indexer\\service.go","functions":10,"classes":5,"variables":50}
+{"nodes":25,"edges":40,"path":"...service.go"}
+{"paths_found":1,"source":"user_input","sink":"os/exec"}
+```
+
+### 2) 漏洞检索 + PoC 生成
+```
+python test_vuln.py
+python test_poc.py
+```
+说明：
+- `test_vuln.py` 使用 OSV 查询，例如 `CVE-2023-29401`、`GO-2023-1737`。
+- `test_poc.py` 未设置 `ANTHROPIC_API_KEY` 时将返回占位模板，并提示如何启用 AI。
+
 ## 许可
 本项目采用 MIT 许可证。
 
