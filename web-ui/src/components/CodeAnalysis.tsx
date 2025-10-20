@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
+import Grid from '@mui/material/Grid';
 import {
   Box,
   Typography,
   Paper,
   TextField,
   Button,
-  Grid2 as Grid,
   Card,
   CardContent,
   List,
@@ -235,7 +235,7 @@ const CodeAnalysis: React.FC = () => {
         </Typography>
         
         <Grid container spacing={2} alignItems="center">
-          <Grid xs={12} md={4}>
+          <Grid item xs={12} md={4}>
             <TextField
               fullWidth
               label="项目路径"
@@ -245,7 +245,7 @@ const CodeAnalysis: React.FC = () => {
             />
           </Grid>
           
-          <Grid xs={12} md={2}>
+          <Grid item xs={12} md={2}>
             <FormControl fullWidth>
               <InputLabel>语言</InputLabel>
               <Select
@@ -262,7 +262,7 @@ const CodeAnalysis: React.FC = () => {
             </FormControl>
           </Grid>
 
-          <Grid xs={12} md={2}>
+          <Grid item xs={12} md={2}>
             <FormControl fullWidth>
               <InputLabel>分析类型</InputLabel>
               <Select
@@ -278,7 +278,7 @@ const CodeAnalysis: React.FC = () => {
             </FormControl>
           </Grid>
 
-          <Grid xs={12} md={2}>
+          <Grid item xs={12} md={2}>
             <Button
               variant="contained"
               startIcon={loading ? <CircularProgress size={20} /> : <PlayArrow />}
@@ -295,7 +295,7 @@ const CodeAnalysis: React.FC = () => {
       {/* 分析结果概览 */}
       {results.length > 0 && (
         <Grid container spacing={3} sx={{ mb: 3 }}>
-          <Grid xs={12} sm={6} md={3}>
+          <Grid item xs={12} sm={6} md={3}>
             <Card>
               <CardContent>
                 <Box display="flex" alignItems="center" justifyContent="space-between">
@@ -313,7 +313,7 @@ const CodeAnalysis: React.FC = () => {
             </Card>
           </Grid>
 
-          <Grid xs={12} sm={6} md={3}>
+          <Grid item xs={12} sm={6} md={3}>
              <Card>
                <CardContent>
                  <Box display="flex" alignItems="center" justifyContent="space-between">
@@ -331,7 +331,7 @@ const CodeAnalysis: React.FC = () => {
              </Card>
            </Grid>
 
-           <Grid xs={12} sm={6} md={3}>
+           <Grid item xs={12} sm={6} md={3}>
              <Card>
                <CardContent>
                  <Box display="flex" alignItems="center" justifyContent="space-between">
@@ -349,7 +349,7 @@ const CodeAnalysis: React.FC = () => {
              </Card>
            </Grid>
 
-           <Grid xs={12} sm={6} md={3}>
+           <Grid item xs={12} sm={6} md={3}>
              <Card>
                <CardContent>
                  <Box display="flex" alignItems="center" justifyContent="space-between">

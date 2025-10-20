@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
+import Grid from '@mui/material/Grid';
 import {
   Box,
   Typography,
   Paper,
   TextField,
   Button,
-  Grid2 as Grid,
   Card,
   CardContent,
   List,
@@ -218,7 +218,7 @@ const TaintAnalysis: React.FC = () => {
 
       <Grid container spacing={3}>
         {/* 路径追踪 */}
-        <Grid xs={12} md={6}>
+        <Grid item xs={12} md={6}>
           <Paper elevation={2} sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom>
               <Timeline sx={{ mr: 1, verticalAlign: 'middle' }} />
@@ -292,10 +292,10 @@ const TaintAnalysis: React.FC = () => {
         </Grid>
 
         {/* 源和汇聚查询 */}
-        <Grid xs={12} md={6}>
+        <Grid item xs={12} md={6}>
           <Grid container spacing={2}>
             {/* 数据源查询 */}
-            <Grid xs={12}>
+            <Grid item xs={12}>
           <Paper elevation={2} sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom>
               <Source sx={{ mr: 1, verticalAlign: 'middle' }} />
@@ -356,7 +356,7 @@ const TaintAnalysis: React.FC = () => {
             </Grid>
 
             {/* 汇聚点查询 */}
-            <Grid xs={12}>
+            <Grid item xs={12}>
               <Paper elevation={2} sx={{ p: 3 }}>
                 <Typography variant="h6" gutterBottom>
                   <CallSplit sx={{ mr: 1, verticalAlign: 'middle' }} />
@@ -419,7 +419,7 @@ const TaintAnalysis: React.FC = () => {
         </Grid>
 
         {/* 使用说明 */}
-        <Grid xs={12}>
+        <Grid item xs={12}>
           <Alert severity="info" icon={<Info />}>
             <Typography variant="body2">
               <strong>使用说明：</strong>

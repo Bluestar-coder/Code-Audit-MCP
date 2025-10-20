@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import Grid from '@mui/material/Grid';
 import {
-  Grid2 as Grid,
   Card,
   CardContent,
   Typography,
@@ -184,19 +184,19 @@ const Dashboard: React.FC = () => {
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
-                  data={pieData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {pieData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  data={vulnerabilityData}
+                   cx="50%"
+                   cy="50%"
+                   labelLine={false}
+                  label={(entry: any) => `${entry.name} ${(entry.percent * 100).toFixed(0)}%`}
+                   outerRadius={80}
+                   fill="#8884d8"
+                   dataKey="value"
+                 >
+                  {vulnerabilityData.map((entry: { color: string }, index: number) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
-                </Pie>
+                 </Pie>
                 <Tooltip />
               </PieChart>
             </ResponsiveContainer>
@@ -208,12 +208,14 @@ const Dashboard: React.FC = () => {
               漏洞趋势
             </Typography>
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={barData}>
+              <BarChart data={trendData}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
+                <XAxis dataKey="month" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="count" fill="#8884d8" />
+                <Legend />
+                <Bar dataKey="vulnerabilities" fill="#8884d8" name="漏洞数" />
+                <Bar dataKey="fixed" fill="#82ca9d" name="已修复" />
               </BarChart>
             </ResponsiveContainer>
           </Paper>
@@ -225,7 +227,7 @@ const Dashboard: React.FC = () => {
               项目状态
             </Typography>
             <Grid container spacing={2}>
-              <Grid>
+              <Grid xs={12} md={4}>
                 <Chip
                   icon={<CheckCircle />}
                   label={`${analysisStats.functions} 个函数`}
@@ -233,7 +235,7 @@ const Dashboard: React.FC = () => {
                   variant="outlined"
                 />
               </Grid>
-              <Grid>
+              <Grid xs={12} md={4}>
                 <Chip
                   icon={<Code />}
                   label={`${analysisStats.classes} 个类`}
@@ -241,7 +243,7 @@ const Dashboard: React.FC = () => {
                   variant="outlined"
                 />
               </Grid>
-              <Grid>
+              <Grid xs={12} md={4}>
                 <Chip
                   icon={<Security />}
                   label={`${vulnStats.fixed}/${vulnStats.total} 漏洞已修复`}
