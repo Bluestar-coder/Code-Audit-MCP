@@ -1,0 +1,93 @@
+syntax = "proto3";
+
+package codeaudit;
+
+option go_package = "./proto";
+option java_package = "com.codeaudit.proto";
+
+// AST 解析服务
+service ASTParser {
+  // 解析单个文件
+  rpc ParseFile(ParseRequest) returns (ParseResponse);
+  
+  // 批量解析文件
+  rpc ParseBatch(BatchParseRequest) returns (stream ParseResponse);
+}
+
+// 解析单个文件请求
+message ParseRequest {
+  string file_path = 1;           // 文件路径
+  string language = 2;             // 编程语言 (go, python, java, javascript, php, etc.)
+  bytes content = 3;               // 文件内容（如果为空则从file_path读取）
+  bool include_metadata = 4;       // 是否包含元数据
+}
+
+// 解析响应
+message ParseResponse {
+  string file_path = 1;           // 文件路径
+  bool success = 2;               // 是否成功解析
+  bytes ast_data = 3;             // 序列化的AST数据（JSON格式）
+  repeated ParseError errors = 4; // 解析错误
+  ParseMetadata metadata = 5;     // 元数据
+}
+
+// 解析错误信息
+message ParseError {
+  int32 line = 1;                 // 错误行号
+  int32 column = 2;               // 错误列号
+  string message = 3;             // 错误消息
+  string error_type = 4;          // 错误类型
+}
+
+// 元数据
+message ParseMetadata {
+  int64 parse_time_ms = 1;        // 解析耗时（毫秒）
+  int32 total_lines = 2;          // 总行数
+  int32 total_functions = 3;      // 函数总数
+  int32 total_classes = 4;        // 类总数
+  string language_version = 5;    // 语言版本
+}
+
+// 批量解析请求
+message BatchParseRequest {
+  repeated ParseRequest requests = 1; // 待解析文件列表
+  int32 max_concurrent = 2;          // 最大并发数（默认4）
+}
+
+// AST 节点信息
+message ASTNode {
+  string id = 1;                  // 节点ID
+  string type = 2;                // 节点类型 (FunctionDecl, ClassDecl, etc.)
+  string name = 3;                // 节点名称
+  int32 start_line = 4;           // 起始行号
+  int32 start_column = 5;         // 起始列号
+  int32 end_line = 6;             // 结束行号
+  int32 end_column = 7;           // 结束列号
+  string source_code = 8;         // 源代码片段
+  repeated ASTNode children = 9;  // 子节点
+  repeated KeyValue attributes = 10; // 额外属性
+}
+
+// 键值对
+message KeyValue {
+  string key = 1;
+  string value = 2;
+}
+
+// 语言信息
+enum Language {
+  UNKNOWN = 0;
+  GO = 1;
+  PYTHON = 2;
+  JAVA = 3;
+  JAVASCRIPT = 4;
+  TYPESCRIPT = 5;
+  PHP = 6;
+  RUBY = 7;
+  RUST = 8;
+  CSHARP = 9;
+  CPP = 10;
+  C = 11;
+  SOLIDITY = 12;
+  VYPER = 13;
+}
