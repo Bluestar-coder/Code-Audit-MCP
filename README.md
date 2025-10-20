@@ -4,11 +4,30 @@
 
 ## 快速开始（Windows）
 
-- 前置：安装 `Python 3.12+`、`Go 1.21+`
+- 前置：安装 `Python 3.11+`、`Go 1.24+`（以及可选 `Node.js 18+` 用于 Web UI）
+- Python 环境（推荐虚拟环境）
+```
+cd python-mcp
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -e .            # 安装核心依赖
+# 可选：开发依赖
+pip install -e .[dev]
+```
 - 启动 Go 后端（gRPC，默认 `localhost:50051`）
 ```
 cd go-backend
+go mod download
 go run cmd/server/main.go cmd/server/http_server.go
+# 或构建后运行：
+# go build -o server.exe ./cmd/server
+# .\server.exe
+```
+- 启动 Web UI（可选）
+```
+cd web-ui
+npm install
+npm start   # 访问 http://localhost:3000
 ```
 - 运行 Python 工具快速验证
 ```
