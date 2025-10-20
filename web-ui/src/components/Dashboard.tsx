@@ -139,7 +139,7 @@ const Dashboard: React.FC = () => {
       
       {/* 统计卡片 */}
       <Grid container spacing={3} sx={{ mb: 3 }}>
-        <Grid xs={12} sm={6} md={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <StatCard
             title="总漏洞数"
             value={vulnStats.total}
@@ -148,7 +148,7 @@ const Dashboard: React.FC = () => {
             subtitle={`${vulnStats.fixed} 个已修复`}
           />
         </Grid>
-        <Grid xs={12} sm={6} md={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <StatCard
             title="严重漏洞"
             value={vulnStats.critical}
@@ -156,7 +156,7 @@ const Dashboard: React.FC = () => {
             color="#d32f2f"
           />
         </Grid>
-        <Grid xs={12} sm={6} md={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <StatCard
             title="已分析文件"
             value={analysisStats.filesAnalyzed}
@@ -164,7 +164,7 @@ const Dashboard: React.FC = () => {
             color="#1976d2"
           />
         </Grid>
-        <Grid xs={12} sm={6} md={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <StatCard
             title="代码行数"
             value={analysisStats.linesOfCode.toLocaleString()}
@@ -176,7 +176,7 @@ const Dashboard: React.FC = () => {
 
       {/* 图表区域 */}
       <Grid container spacing={3}>
-        <Grid xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Paper elevation={2} sx={{ p: 2, height: 400 }}>
             <Typography variant="h6" gutterBottom>
               漏洞分布
@@ -202,7 +202,7 @@ const Dashboard: React.FC = () => {
             </ResponsiveContainer>
           </Paper>
         </Grid>
-        <Grid xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Paper elevation={2} sx={{ p: 2, height: 400 }}>
             <Typography variant="h6" gutterBottom>
               漏洞趋势
@@ -221,13 +221,13 @@ const Dashboard: React.FC = () => {
           </Paper>
         </Grid>
         {/* 快速状态 */}
-        <Grid xs={12}>
+        <Grid size={12}>
           <Paper elevation={2} sx={{ p: 2 }}>
             <Typography variant="h6" gutterBottom>
               项目状态
             </Typography>
             <Grid container spacing={2}>
-              <Grid xs={12} md={4}>
+              <Grid size={{ xs: 12, md: 4 }}>
                 <Chip
                   icon={<CheckCircle />}
                   label={`${analysisStats.functions} 个函数`}
@@ -235,7 +235,7 @@ const Dashboard: React.FC = () => {
                   variant="outlined"
                 />
               </Grid>
-              <Grid xs={12} md={4}>
+              <Grid size={{ xs: 12, md: 4 }}>
                 <Chip
                   icon={<Code />}
                   label={`${analysisStats.classes} 个类`}
@@ -243,7 +243,7 @@ const Dashboard: React.FC = () => {
                   variant="outlined"
                 />
               </Grid>
-              <Grid xs={12} md={4}>
+              <Grid size={{ xs: 12, md: 4 }}>
                 <Chip
                   icon={<Security />}
                   label={`${vulnStats.fixed}/${vulnStats.total} 漏洞已修复`}
