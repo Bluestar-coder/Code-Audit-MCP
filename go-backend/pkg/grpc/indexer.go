@@ -41,20 +41,17 @@ func (s *IndexerService) BuildIndex(ctx context.Context, req *pb.BuildIndexReque
 	result, err := s.service.BuildIndex(req.FilePath, req.Language, req.AstData, req.Incremental)
 	if err != nil {
 		return &pb.BuildIndexResponse{
-			Success: false,
-			Message: err.Error(),
+			Success:      false,
+			ErrorMessage: err.Error(),
 		}, nil
 	}
 	
 	return &pb.BuildIndexResponse{
-		Success: result.Success,
-		IndexId: result.IndexID,
-		Message: "Index built successfully",
-		Stats: &pb.IndexStats{
-			FunctionsIndexed: int32(result.FunctionsIndexed),
-			ClassesIndexed:   int32(result.ClassesIndexed),
-			VariablesIndexed: int32(result.VariablesIndexed),
-		},
+		Success:           result.Success,
+		IndexId:           result.IndexID,
+		FunctionsIndexed:  int32(result.FunctionsIndexed),
+		ClassesIndexed:    int32(result.ClassesIndexed),
+		VariablesIndexed:  int32(result.VariablesIndexed),
 	}, nil
 }
 
@@ -75,27 +72,27 @@ func (s *IndexerService) QueryFunction(ctx context.Context, req *pb.QueryFunctio
 	
 	var functions []*pb.FunctionInfo
 	for _, fn := range result.Functions {
-		var params []*pb.Parameter
+		var params []string
 		for _, param := range fn.Parameters {
-			params = append(params, &pb.Parameter{
-				Name: param.Name,
-				Type: param.Type,
-			})
+			params = append(params, param.Name+" "+param.Type)
 		}
 		
 		functions = append(functions, &pb.FunctionInfo{
-			Name:       fn.Name,
-			FilePath:   fn.FilePath,
-			StartLine:  int32(fn.StartLine),
-			EndLine:    int32(fn.EndLine),
-			Signature:  fn.Signature,
-			Parameters: params,
-			ReturnType: fn.ReturnType,
+			Id:                    fn.ID,
+			Name:                  fn.Name,
+			FilePath:              fn.FilePath,
+			StartLine:             int32(fn.StartLine),
+			EndLine:               int32(fn.EndLine),
+			Signature:             fn.Signature,
+			CyclomaticComplexity:  int32(fn.CyclomaticComplexity),
+			Parameters:            params,
+			ReturnType:            fn.ReturnType,
 		})
 	}
 	
 	return &pb.QueryFunctionResponse{
-		Functions: functions,
+		Functions:   functions,
+		TotalCount:  int32(len(functions)),
 	}, nil
 }
 
@@ -118,35 +115,36 @@ func (s *IndexerService) QueryClass(ctx context.Context, req *pb.QueryClassReque
 	for _, cls := range result.Classes {
 		var methods []*pb.MethodInfo
 		for _, method := range cls.Methods {
-			var params []*pb.Parameter
-			for _, param := range method.Parameters {
-				params = append(params, &pb.Parameter{
-					Name: param.Name,
-					Type: param.Type,
-				})
-			}
-			
 			methods = append(methods, &pb.MethodInfo{
+				Id:         method.ID,
 				Name:       method.Name,
-				StartLine:  int32(method.StartLine),
-				EndLine:    int32(method.EndLine),
-				Signature:  method.Signature,
-				Parameters: params,
+				IsStatic:   method.IsStatic,
+				IsPrivate:  method.IsPrivate,
 				ReturnType: method.ReturnType,
 			})
 		}
 		
+		var fields []string
+		for _, field := range cls.Fields {
+			fields = append(fields, field.Name+" "+field.Type)
+		}
+		
 		classes = append(classes, &pb.ClassInfo{
-			Name:      cls.Name,
-			FilePath:  cls.FilePath,
-			StartLine: int32(cls.StartLine),
-			EndLine:   int32(cls.EndLine),
-			Methods:   methods,
+			Id:         cls.ID,
+			Name:       cls.Name,
+			FilePath:   cls.FilePath,
+			StartLine:  int32(cls.StartLine),
+			EndLine:    int32(cls.EndLine),
+			BaseClass:  cls.BaseClass,
+			Interfaces: cls.Interfaces,
+			Methods:    methods,
+			Fields:     fields,
 		})
 	}
 	
 	return &pb.QueryClassResponse{
-		Classes: classes,
+		Classes:    classes,
+		TotalCount: int32(len(classes)),
 	}, nil
 }
 
@@ -177,7 +175,8 @@ func (s *IndexerService) QueryCallers(ctx context.Context, req *pb.QueryCallersR
 	}
 
 	return &pb.QueryCallersResponse{
-		Callers: callers,
+		Callers:    callers,
+		TotalCount: int32(len(callers)),
 	}, nil
 }
 
@@ -208,7 +207,8 @@ func (s *IndexerService) QueryCallees(ctx context.Context, req *pb.QueryCalleesR
 	}
 
 	return &pb.QueryCalleesResponse{
-		Callees: callees,
+		Callees:    callees,
+		TotalCount: int32(len(callees)),
 	}, nil
 }
 
@@ -222,12 +222,12 @@ func (s *IndexerService) SearchSymbol(req *pb.SearchSymbolRequest, stream pb.Ind
 		MaxResults: int(req.MaxResults),
 	}
 
-	result, err := s.service.SearchSymbol(queryReq)
+	symbols, err := s.service.SearchSymbol(queryReq)
 	if err != nil {
 		return err
 	}
 
-	for _, symbol := range result.Symbols {
+	for _, symbol := range symbols {
 		response := &pb.SearchSymbolResponse{
 			SymbolId:       symbol.SymbolID,
 			SymbolName:     symbol.SymbolName,
@@ -235,7 +235,6 @@ func (s *IndexerService) SearchSymbol(req *pb.SearchSymbolRequest, stream pb.Ind
 			FilePath:       symbol.FilePath,
 			LineNumber:     int32(symbol.LineNumber),
 			RelevanceScore: symbol.RelevanceScore,
-			Context:        symbol.Context,
 		}
 
 		if err := stream.Send(response); err != nil {

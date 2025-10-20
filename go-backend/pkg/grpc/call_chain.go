@@ -57,14 +57,14 @@ func (s *CallChainAnalyzerService) QueryCallDepth(ctx context.Context, req *pb.Q
 
 // AnalyzeCycles implements pb.CallChainAnalyzer/AnalyzeCycles
 func (s *CallChainAnalyzerService) AnalyzeCycles(ctx context.Context, req *pb.AnalyzeCyclesRequest) (*pb.AnalyzeCyclesResponse, error) {
-	log.Printf("🔄 Analyzing cycles in graph: %s", req.GraphId)
+	log.Printf("🔄 Analyzing cycles starting at: %s", req.StartFunction)
 
 	return s.service.AnalyzeCycles(ctx, req)
 }
 
 // FindDeadCode implements pb.CallChainAnalyzer/FindDeadCode
 func (s *CallChainAnalyzerService) FindDeadCode(ctx context.Context, req *pb.FindDeadCodeRequest) (*pb.FindDeadCodeResponse, error) {
-	log.Printf("💀 Finding dead code in graph: %s", req.GraphId)
+	log.Printf("💀 Finding dead code in file: %s", req.FilePath)
 
 	return s.service.FindDeadCode(ctx, req)
 }

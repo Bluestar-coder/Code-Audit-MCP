@@ -242,16 +242,16 @@ func (s *IndexerService) parseGoFile(filePath string, astData []byte) (*FileInde
 		case *ast.GenDecl:
 			// 处理类型声明（结构体、接口等）
 			for _, spec := range node.Specs {
-				switch s := spec.(type) {
+				switch specNode := spec.(type) {
 				case *ast.TypeSpec:
-					if structType, ok := s.Type.(*ast.StructType); ok {
-						class := s.extractGoStruct(s, structType, filePath)
+					if structType, ok := specNode.Type.(*ast.StructType); ok {
+						class := s.extractGoStruct(specNode, structType, filePath)
 						index.Classes[class.ID] = class
 					}
 				case *ast.ValueSpec:
 					// 处理变量声明
-					for _, name := range s.Names {
-						variable := s.extractGoVariable(name, s, filePath)
+					for _, name := range specNode.Names {
+						variable := s.extractGoVariable(name, specNode, filePath)
 						index.Variables[variable.ID] = variable
 					}
 				}
