@@ -1,0 +1,16 @@
+name: Clean Release Check
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  clean-check:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Run clean state check
+        shell: pwsh
+        run: |
+          ./scripts/check-clean-state.ps1

@@ -1,37 +1,46 @@
-design.md
-requirements.md
-COMPLETION_REPORT.md
-implementation_plan.md
-.gitignore
-QUICK_START.md
-PROJECT_SUMMARY.md
-go-backend/cmd/server/data/audit.db/00001.mem
-go-backend/cmd/server/data/audit.db/000001.vlog
-go-backend/cmd/server/data/audit.db/DISCARD
-go-backend/cmd/server/data/audit.db/KEYREGISTRY
-go-backend/cmd/server/data/audit.db/MANIFEST
-go-backend/cmd/server/data/audit.db/callchain/00001.mem
-go-backend/cmd/server/data/audit.db/callchain/000001.vlog
-go-backend/cmd/server/data/audit.db/callchain/DISCARD
-go-backend/cmd/server/data/audit.db/callchain/KEYREGISTRY
-go-backend/cmd/server/data/audit.db/callchain/MANIFEST
-go-backend/data/audit.db/00001.mem
-go-backend/data/audit.db/000001.vlog
-go-backend/data/audit.db/DISCARD
-go-backend/data/audit.db/KEYREGISTRY
-go-backend/data/audit.db/LOCK
-go-backend/data/audit.db/MANIFEST
-.gitignore
-go-backend/data/audit.db/MANIFEST
-go-backend/data/audit.db/callchain/00001.mem
-go-backend/data/audit.db/callchain/000001.vlog
-go-backend/data/audit.db/callchain/DISCARD
-go-backend/data/audit.db/callchain/KEYREGISTRY
-go-backend/data/audit.db/callchain/LOCK
-go-backend/data/audit.db/callchain/MANIFEST
-.gitignore
-go-backend/data/audit.db/00002.mem
-go-backend/data/audit.db/000002.vlog
-go-backend/data/audit.db/callchain/00002.mem
-go-backend/data/audit.db/callchain/000002.vlog
-go-backend/server.exe
+# OS junk
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+frontend/.env*
+frontend/dist/
+frontend/build/
+frontend/coverage/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.venv/
+venv/
+.mypy_cache/
+.coverage
+coverage/
+
+# Go
+*.exe
+*.out
+*.test
+bin/
+backend/server.exe
+backend/bin/
+
+# BadgerDB data
+backend/data/audit.db/
+backend/cmd/server/data/audit.db/
+
+# Generated protobuf cache
+proto/__pycache__/
+backend/proto/__pycache__/

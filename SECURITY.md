@@ -4,27 +4,34 @@ We take security seriously. Please follow the guidelines below when reporting vu
 
 ## Reporting a Vulnerability
 - Do NOT open public issues for security vulnerabilities.
-- Instead, use one of the following confidential channels:
+- Use one of the following confidential channels:
   - GitHub Security Advisories (preferred)
   - Email the maintainers: [REPLACE WITH CONTACT EMAIL]
-- Provide as much detail as possible:
-  - Affected components (e.g., `go-backend`, `python-mcp`, `web-ui`)
+- Include sufficient detail:
+  - Affected components (e.g., `backend`, `mcp`, `frontend`)
   - Version/commit where the issue was found
-  - Steps to reproduce, PoC (if available)
+  - Steps to reproduce and PoC (if available)
   - Impact assessment and suggested severity
 
 ## Disclosure Timeline
-- We aim to acknowledge reports within 3 business days.
-- We will work with you to validate the issue and prepare a fix.
-- Once a fix is available, we will publish a new release and a public advisory.
+- We acknowledge reports within 3 business days.
+- We coordinate validation, remediation, and fix preparation with reporters.
+- After a fix is available, we will publish a new release and a public advisory.
 
 ## Supported Versions
-- This is an active development project. We generally patch the latest release.
-- If you require backports, please communicate your needs in the initial report.
+- Active development project: we generally patch the latest release.
+- Backports may be considered upon request and feasibility.
 
 ## Scope
-- Vulnerabilities in analysis logic (AST/index/call chain/taint/scanner)
-- HTTP/gRPC endpoints and authentication/authorization (if applicable)
-- Web UI input handling and output rendering (e.g., XSS)
+- Analysis logic: AST / index / call chain / taint / rule scanner.
+- Service interfaces: HTTP/gRPC endpoints, authentication/authorization (if applicable).
+- MCP integration: tools interface and host interactions.
+- Frontend: input handling and output rendering (e.g., XSS).
+- Rules library: rule parsing/evaluation leading to security impact.
 
-Thanks for responsibly disclosing and helping improve the project’s security.
+## Testing Guidance
+- Use local or isolated environments when validating vulnerabilities.
+- Avoid disruptive testing against production deployments.
+- Provide minimal reproduction artifacts to help triage quickly.
+
+Thank you for responsibly disclosing and helping improve the project’s security.

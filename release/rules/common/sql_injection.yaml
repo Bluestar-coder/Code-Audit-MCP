@@ -1,0 +1,78 @@
+name: "SQL Injection Detection"
+id: "sql_injection"
+category: "injection"
+severity: "high"
+description: "检测潜在的SQL注入漏洞"
+language: ["javascript", "typescript", "python", "go"]
+
+patterns:
+  # 直接字符串拼接SQL
+  - pattern: |
+      query.*=.*".*".*\+.*
+    message: "检测到SQL查询字符串拼接，可能存在SQL注入风险"
+    severity: "high"
+    
+  - pattern: |
+      .*\.query\(.*\+.*\)
+    message: "数据库查询使用字符串拼接，存在SQL注入风险"
+    severity: "high"
+    
+  - pattern: |
+      .*\.exec\(.*\+.*\)
+    message: "数据库执行使用字符串拼接，存在SQL注入风险"
+    severity: "high"
+
+  # Python特定模式
+  - pattern: |
+      cursor\.execute\(.*%.*\)
+    message: "使用字符串格式化构建SQL查询，存在SQL注入风险"
+    severity: "high"
+    language: ["python"]
+    
+  - pattern: |
+      cursor\.execute\(.*\.format\(.*\).*\)
+    message: "使用.format()构建SQL查询，存在SQL注入风险"
+    severity: "high"
+    language: ["python"]
+
+  # JavaScript/TypeScript特定模式
+  - pattern: |
+      .*\.query\(`.*\$\{.*\}.*`\)
+    message: "使用模板字符串构建SQL查询，存在SQL注入风险"
+    severity: "high"
+    language: ["javascript", "typescript"]
+
+safe_patterns:
+  # 参数化查询是安全的
+  - pattern: |
+      .*\.query\(.*,\s*\[.*\]\)
+    message: "使用参数化查询，安全"
+    
+  - pattern: |
+      .*\.prepare\(.*\)
+    message: "使用预处理语句，安全"
+
+examples:
+  vulnerable:
+    - |
+      // 危险：字符串拼接
+      const query = "SELECT * FROM users WHERE id = " + userId;
+      db.query(query);
+    - |
+      # 危险：Python字符串格式化
+      cursor.execute("SELECT * FROM users WHERE name = '%s'" % username)
+    - |
+      // 危险：模板字符串
+      db.query(`SELECT * FROM products WHERE category = '${category}'`);
+      
+  safe:
+    - |
+      // 安全：参数化查询
+      db.query("SELECT * FROM users WHERE id = ?", [userId]);
+    - |
+      # 安全：Python参数化查询
+      cursor.execute("SELECT * FROM users WHERE name = %s", (username,))
+    - |
+      // 安全：预处理语句
+      const stmt = db.prepare("SELECT * FROM products WHERE category = ?");
+      stmt.run(category);

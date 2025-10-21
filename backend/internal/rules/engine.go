@@ -1,0 +1,678 @@
+package rules
+
+import (
+	"encoding/json"
+	"fmt"
+	"regexp"
+	"strings"
+	"time"
+)
+
+// VulnerabilityRule 漏洞检测规则
+type VulnerabilityRule struct {
+	Name        string            `json:"name"`
+	ID          string            `json:"id"`
+	Category    string            `json:"category"`
+	Severity    string            `json:"severity"`
+	Description string            `json:"description"`
+	Language    []string          `json:"language"`
+	Patterns    []Pattern         `json:"patterns"`
+	SafePatterns []Pattern        `json:"safe_patterns"`
+	Examples    Examples          `json:"examples"`
+}
+
+// Pattern 检测模式
+type Pattern struct {
+	Pattern  string   `json:"pattern"`
+	Message  string   `json:"message"`
+	Severity string   `json:"severity"`
+	Language []string `json:"language"`
+}
+
+// Examples 示例代码
+type Examples struct {
+	Vulnerable []string `json:"vulnerable"`
+	Safe       []string `json:"safe"`
+}
+
+// Finding 检测发现的问题
+type Finding struct {
+	RuleID      string            `json:"rule_id"`
+	RuleName    string            `json:"rule_name"`
+	Category    string            `json:"category"`
+	Severity    string            `json:"severity"`
+	Message     string            `json:"message"`
+	FilePath    string            `json:"file_path"`
+	Line        int               `json:"line"`
+	Column      int               `json:"column"`
+	Code        string            `json:"code"`
+	Language    string            `json:"language"`
+	Metadata    map[string]interface{} `json:"metadata"`
+}
+
+// RuleEngine 规则引擎
+type RuleEngine struct {
+	rules       []VulnerabilityRule
+	rulesByLang map[string][]VulnerabilityRule
+}
+
+// NewRuleEngine 创建新的规则引擎
+func NewRuleEngine() *RuleEngine {
+	return &RuleEngine{
+		rules:       make([]VulnerabilityRule, 0),
+		rulesByLang: make(map[string][]VulnerabilityRule),
+	}
+}
+
+// LoadBuiltinRules 加载内置规则
+func (re *RuleEngine) LoadBuiltinRules() error {
+	// SQL注入规则
+	sqlInjectionRule := VulnerabilityRule{
+		Name:        "SQL Injection Detection",
+		ID:          "sql_injection",
+		Category:    "injection",
+		Severity:    "high",
+		Description: "Detects potential SQL injection vulnerabilities",
+		Language:    []string{"javascript", "typescript", "python", "go", "java", "csharp", "php", "ruby", "nodejs", "rust"},
+		Patterns: []Pattern{
+			{
+				Pattern:  `["\'].*\+.*["\']`,
+				Message:  "Potential SQL injection: string concatenation in SQL query",
+				Severity: "high",
+			},
+			{
+				Pattern:  `\$\{.*\}`,
+				Message:  "Potential SQL injection: template string in SQL query",
+				Severity: "high",
+			},
+			{
+				Pattern:  `(?i)(query|execute|exec)\s*\(\s*.*%.*%`,
+				Message:  "Potential SQL injection: string formatting in SQL query",
+				Severity: "high",
+			},
+			// PHP: 使用 '.' 拼接的查询
+			{
+				Pattern:  `(?i)(mysql_query|mysqli_query|pg_query|query)\s*\(\s*.*\.\s*.*\)`,
+				Message:  "Potential SQL injection: string concatenation with '.' (PHP)",
+				Severity: "high",
+				Language: []string{"php"},
+			},
+			// Java: Statement/PreparedStatement 拼接
+			{
+				Pattern:  `(?i)(createQuery|prepareStatement|Statement\.execute(?:Query|Update)?)\s*\(\s*.*\+.*\)`,
+				Message:  "Potential SQL injection: Java SQL API with concatenated query",
+				Severity: "high",
+				Language: []string{"java"},
+			},
+			// C#: SqlCommand 拼接
+			{
+				Pattern:  `SqlCommand\s*\(\s*.*\+.*\)`,
+				Message:  "Potential SQL injection: SqlCommand with string concatenation",
+				Severity: "high",
+				Language: []string{"csharp"},
+			},
+			// Ruby: 字符串插值
+			{
+				Pattern:  `\b(where|find_by_sql|execute)\s*\(\s*["\'].*#\{.*\}.*["\']\s*\)`,
+				Message:  "Potential SQL injection: Ruby string interpolation in SQL",
+				Severity: "high",
+				Language: []string{"ruby"},
+			},
+			// 通用: .format 构造查询
+			{
+				Pattern:  `\.format\s*\(.*\)`,
+				Message:  "Potential SQL injection: string.format used to build query",
+				Severity: "high",
+				Language: []string{"python", "java", "csharp"},
+			},
+			// Node.js: Express/ORM 查询拼接
+			{
+				Pattern:  `(?i)(mysql|pg|sequelize|knex)[\w\.]*\.(query|raw|execute)\s*\(\s*.*\+.*\)`,
+				Message:  "Potential SQL injection: Node.js DB query with concatenated SQL",
+				Severity: "high",
+				Language: []string{"nodejs"},
+			},
+			// Java: Spring JdbcTemplate 拼接
+			{
+				Pattern:  `JdbcTemplate\.(query|queryForList|update)\s*\(\s*.*\+.*\)`,
+				Message:  "Potential SQL injection: JdbcTemplate with concatenated SQL",
+				Severity: "high",
+				Language: []string{"java"},
+			},
+			// ruoyi/MyBatis 注解中使用 ${} 动态拼接
+			{
+				Pattern:  `@Select\s*\(\s*["'][^"']*\$\{[^}]+\}[^"']*["']\s*\)`,
+				Message:  "Potential SQL injection: MyBatis annotation with ${} (ruoyi)",
+				Severity: "high",
+				Language: []string{"java"},
+			},
+			// ruoyi/MyBatis XML 使用 ${} 动态拼接
+			{
+				Pattern:  `(?s)<select[^>]*>[^<]*\$\{[^}]+\}[^<]*</select>`,
+				Message:  "Potential SQL injection: MyBatis XML with ${} (ruoyi)",
+				Severity: "high",
+				Language: []string{"java"},
+			},
+			// Python: Django/Flask 原始执行 + 拼接
+			{
+				Pattern:  `(?i)cursor\.execute\s*\(\s*.*\+.*\)`,
+				Message:  "Potential SQL injection: Python cursor.execute with concatenation",
+				Severity: "high",
+				Language: []string{"python"},
+			},
+			// Python: 原始 SQL f-string
+			{
+				Pattern:  `(?i)raw\s*\(\s*["'][^"']*\{[^}]+\}[^"']*["']\s*\)`,
+				Message:  "Potential SQL injection: Python raw() with f-string interpolation",
+				Severity: "high",
+				Language: []string{"python"},
+			},
+			// PHP: ThinkPHP Db::query/execute 使用 '.' 拼接
+			{
+				Pattern:  `(?i)\b(Db|think\\Db)::(query|execute)\s*\(\s*.*\.\s*.*\)`,
+				Message:  "Potential SQL injection: ThinkPHP Db query with '.' concatenation",
+				Severity: "high",
+				Language: []string{"php"},
+			},
+		},
+		SafePatterns: []Pattern{
+			{
+				Pattern: `(?i)(prepare|prepared|parameterized)`,
+				Message: "Safe: using prepared statements",
+			},
+			// Java: PreparedStatement 占位符
+			{
+				Pattern: `prepareStatement\s*\(\s*.*\?`,
+				Message: "Safe: using PreparedStatement with placeholders",
+				Language: []string{"java"},
+			},
+			// PHP: PDO 预处理
+			{
+				Pattern: `->prepare\s*\(\s*.*\?`,
+				Message: "Safe: using PDO prepared statements",
+				Language: []string{"php"},
+			},
+			// C#: 参数化查询
+			{
+				Pattern: `Parameters\.AddWithValue|SqlParameter`,
+				Message: "Safe: using parameterized queries",
+				Language: []string{"csharp"},
+			},
+		},
+	}
+
+	// XSS规则
+	xssRule := VulnerabilityRule{
+		Name:        "Cross-Site Scripting (XSS) Detection",
+		ID:          "xss",
+		Category:    "injection",
+		Severity:    "medium",
+		Description: "Detects potential XSS vulnerabilities",
+		Language:    []string{"javascript", "typescript", "python", "php", "java", "csharp", "ruby", "nodejs", "rust"},
+		Patterns: []Pattern{
+			{
+				Pattern:  `innerHTML\s*=`,
+				Message:  "Potential XSS: direct assignment to innerHTML",
+				Severity: "medium",
+			},
+			{
+				Pattern:  `document\.write\s*\(`,
+				Message:  "Potential XSS: document.write usage",
+				Severity: "medium",
+			},
+			{
+				Pattern:  `\$\(.*\)\.html\s*\(`,
+				Message:  "Potential XSS: jQuery html() usage",
+				Severity: "medium",
+			},
+			// PHP: 直接输出超全局变量
+			{
+				Pattern:  `(?i)(echo|print)\s+.*\$_(GET|POST|REQUEST)`,
+				Message:  "Potential XSS: direct echo/print of user input",
+				Severity: "high",
+				Language: []string{"php"},
+			},
+			// Java: 响应输出
+			{
+				Pattern:  `response\.getWriter\(\)\.write\s*\(`,
+				Message:  "Potential XSS: writing raw data to response",
+				Severity: "medium",
+				Language: []string{"java"},
+			},
+			{
+				Pattern:  `out\.print(?:ln)?\s*\(`,
+				Message:  "Potential XSS: printing raw data to output",
+				Severity: "medium",
+				Language: []string{"java"},
+			},
+			// C#: Response.Write
+			{
+				Pattern:  `Response\.Write\s*\(`,
+				Message:  "Potential XSS: writing raw data to HTTP response",
+				Severity: "medium",
+				Language: []string{"csharp"},
+			},
+			// Ruby: inline 渲染插值
+			{
+				Pattern:  `render\s+inline:\s*["'].*#\{.*\}.*["']`,
+				Message:  "Potential XSS: inline render with unsanitized interpolation",
+				Severity: "medium",
+				Language: []string{"ruby"},
+			},
+			// Node.js: 直接向响应输出原始内容
+			{
+				Pattern:  `(?i)res\.(send|render|write|end)\s*\(`,
+				Message:  "Potential XSS: sending raw data in Node.js response",
+				Severity: "medium",
+				Language: []string{"nodejs"},
+			},
+			// Rust: Web 框架返回原始 HTML
+			{
+				Pattern:  `(?i)(warp::reply::html|axum::response::Html|rocket::response::content::Html)\s*\(`,
+				Message:  "Potential XSS: returning raw HTML in Rust web response",
+				Severity: "medium",
+				Language: []string{"rust"},
+			},
+			// EJS: 非转义输出
+			{
+				Pattern:  `<%-\s*.*\s*%>`,
+				Message:  "Potential XSS: EJS unescaped output <%- %>",
+				Severity: "high",
+				Language: []string{"nodejs"},
+			},
+			// Django: mark_safe
+			{
+				Pattern:  `(?i)mark_safe\s*\(`,
+				Message:  "Potential XSS: Django mark_safe used",
+				Severity: "medium",
+				Language: []string{"python"},
+			},
+			// Django: HttpResponse 原始内容
+			{
+				Pattern:  `(?i)HttpResponse\s*\(`,
+				Message:  "Potential XSS: returning raw data in Django HttpResponse",
+				Severity: "medium",
+				Language: []string{"python"},
+			},
+			// Flask/Markupsafe: Markup 标记为安全
+			{
+				Pattern:  `(?i)Markup\s*\(`,
+				Message:  "Potential XSS: Markup used to mark string as safe",
+				Severity: "medium",
+				Language: []string{"python"},
+			},
+			// Rust/Askama: Markup 非转义
+			{
+				Pattern:  `(?i)askama::Markup\s*\(`,
+				Message:  "Potential XSS: Askama Markup used to bypass escaping",
+				Severity: "medium",
+				Language: []string{"rust"},
+			},
+		},
+		SafePatterns: []Pattern{
+			{
+				Pattern: `textContent|innerText`,
+				Message: "Safe: using textContent or innerText",
+			},
+			// PHP: htmlspecialchars
+			{
+				Pattern: `htmlspecialchars\s*\(`,
+				Message: "Safe: using htmlspecialchars",
+				Language: []string{"php"},
+			},
+			// Java: HTML 转义
+			{
+				Pattern: `StringEscapeUtils\.escapeHtml4\s*\(`,
+				Message: "Safe: using HTML escaping",
+				Language: []string{"java"},
+			},
+			// C#: HtmlEncode
+			{
+				Pattern: `HttpUtility\.HtmlEncode\s*\(`,
+				Message: "Safe: using HTML encoding",
+				Language: []string{"csharp"},
+			},
+			// Ruby: sanitize
+			{
+				Pattern: `sanitize\s*\(`,
+				Message: "Safe: using sanitize helper",
+				Language: []string{"ruby"},
+			},
+			// Node.js: 使用常见的 HTML 清洗/转义库
+			{
+				Pattern: `sanitizeHtml\s*\(|xssFilters\.escapeHTML\s*\(|_\.escape\s*\(`,
+				Message: "Safe: using HTML sanitization/escaping in Node.js",
+				Language: []string{"nodejs"},
+			},
+			// Rust: 使用 HTML 转义或清洗库
+			{
+				Pattern: `html_escape::encode_text\s*\(|htmlescape::encode_minimal\s*\(|ammonia::clean\s*\(`,
+				Message: "Safe: using HTML escaping/sanitization in Rust",
+				Language: []string{"rust"},
+			},
+			// Django/Flask: escape
+			{
+				Pattern: `(?i)(django\.utils\.html\.escape|flask\.escape|markupsafe\.escape)\s*\(`,
+				Message: "Safe: escaping HTML in Python frameworks",
+				Language: []string{"python"},
+			},
+		},
+	}
+
+	// 路径遍历规则
+	pathTraversalRule := VulnerabilityRule{
+		Name:        "Path Traversal Detection",
+		ID:          "path_traversal",
+		Category:    "path_traversal",
+		Severity:    "high",
+		Description: "Detects potential path traversal vulnerabilities",
+		Language:    []string{"javascript", "typescript", "python", "go", "php", "java", "csharp", "ruby", "nodejs", "rust"},
+		Patterns: []Pattern{
+			{
+				Pattern:  `\.\./|\.\.\\`,
+				Message:  "Potential path traversal: relative path detected",
+				Severity: "high",
+			},
+			{
+				Pattern:  `["\'][^"\']*["\']\s*\+\s*\w+`,
+				Message:  "Potential path traversal: string concatenation with user input",
+				Severity: "high",
+			},
+			{
+				Pattern:  `(readFile|writeFile|open|readFileSync|writeFileSync|createReadStream|createWriteStream)\s*\(\s*.*\+`,
+				Message:  "Potential path traversal: file operation with concatenated path",
+				Severity: "high",
+			},
+			// Node.js: path.join 拼接用户输入
+			{
+				Pattern:  `path\.join\s*\(\s*.*\+.*\)`,
+				Message:  "Potential path traversal: path.join with concatenated path",
+				Severity: "high",
+				Language: []string{"nodejs"},
+			},
+			// Flask: 发送文件路径拼接
+			{
+				Pattern:  `(?i)send_file\s*\(\s*.*\+.*\)`,
+				Message:  "Potential path traversal: Flask send_file with concatenated path",
+				Severity: "high",
+				Language: []string{"python"},
+			},
+			{
+				Pattern:  `(?i)send_from_directory\s*\(\s*.*\+.*\)`,
+				Message:  "Potential path traversal: Flask send_from_directory with concatenated path",
+				Severity: "high",
+				Language: []string{"python"},
+			},
+			// Python: open 拼接用户输入
+			{
+				Pattern:  `open\s*\(\s*.*\+.*\)`,
+				Message:  "Potential path traversal: Python open with concatenated path",
+				Severity: "high",
+				Language: []string{"python"},
+			},
+			// PHP: 文件读写/包含
+			{
+				Pattern:  `(?i)file_(get|put)_contents\s*\(.*\$_(GET|POST|REQUEST).*`,
+				Message:  "Potential path traversal: file access with user input (PHP)",
+				Severity: "high",
+				Language: []string{"php"},
+			},
+			{
+				Pattern:  `(?i)(include|require|include_once|require_once)\s+.*\$_(GET|POST|REQUEST)`,
+				Message:  "Potential path traversal: dynamic include/require from user input",
+				Severity: "high",
+				Language: []string{"php"},
+			},
+			// Java: File/Paths 拼接
+			{
+				Pattern:  `new\s+File\s*\(\s*.*\+.*\)`,
+				Message:  "Potential path traversal: Java File constructed with concatenated path",
+				Severity: "high",
+				Language: []string{"java"},
+			},
+			{
+				Pattern:  `Paths\.get\s*\(\s*.*\+.*\)`,
+				Message:  "Potential path traversal: Java Paths.get with concatenated path",
+				Severity: "medium",
+				Language: []string{"java"},
+			},
+			// C#: File 操作拼接
+			{
+				Pattern:  `File\.(ReadAllText|AllBytes|WriteAllText|Open)\s*\(\s*.*\+.*\)`,
+				Message:  "Potential path traversal: C# file operation with concatenated path",
+				Severity: "high",
+				Language: []string{"csharp"},
+			},
+			// Ruby: File 操作拼接
+			{
+				Pattern:  `File\.(read|open)\s*\(\s*.*\+.*\)`,
+				Message:  "Potential path traversal: Ruby file operation with concatenated path",
+				Severity: "high",
+				Language: []string{"ruby"},
+			},
+		},
+		SafePatterns: []Pattern{
+			{
+				Pattern: `path\.resolve|os\.path\.abspath|filepath\.Clean`,
+				Message: "Safe: using path resolution functions",
+			},
+			// PHP: realpath
+			{
+				Pattern: `realpath\s*\(`,
+				Message: "Safe: using realpath to resolve absolute path",
+				Language: []string{"php"},
+			},
+			// Java: 规范化路径
+			{
+				Pattern: `Paths\.get\(.*\)\.normalize`,
+				Message: "Safe: normalizing path",
+				Language: []string{"java"},
+			},
+			// C#: 获取完整路径
+			{
+				Pattern: `System\.IO\.Path\.GetFullPath\s*\(`,
+				Message: "Safe: resolving full path",
+				Language: []string{"csharp"},
+			},
+			// Ruby: 绝对路径
+			{
+				Pattern: `File\.expand_path\s*\(`,
+				Message: "Safe: expanding path to absolute",
+				Language: []string{"ruby"},
+			},
+		},
+	}
+
+	// 添加规则到引擎
+	re.rules = append(re.rules, sqlInjectionRule, xssRule, pathTraversalRule)
+	
+	// 构建按语言索引的规则映射
+	re.buildLanguageIndex()
+	
+	fmt.Printf("✅ Loaded %d built-in vulnerability detection rules\n", len(re.rules))
+	return nil
+}
+
+// buildLanguageIndex 构建按语言索引的规则映射
+func (re *RuleEngine) buildLanguageIndex() {
+	re.rulesByLang = make(map[string][]VulnerabilityRule)
+	
+	for _, rule := range re.rules {
+		for _, lang := range rule.Language {
+			re.rulesByLang[lang] = append(re.rulesByLang[lang], rule)
+		}
+	}
+}
+
+// ScanCode 扫描代码查找漏洞
+func (re *RuleEngine) ScanCode(code, filePath, language string) ([]Finding, error) {
+	startTime := time.Now()
+	var findings []Finding
+
+	// 获取适用于该语言的规则
+	applicableRules := re.rulesByLang[language]
+	if len(applicableRules) == 0 {
+		// 如果没有特定语言的规则，使用通用规则
+		for _, rule := range re.rules {
+			if len(rule.Language) == 0 || contains(rule.Language, language) {
+				applicableRules = append(applicableRules, rule)
+			}
+		}
+	}
+
+	// 按行分割代码
+	lines := strings.Split(code, "\n")
+
+	// 对每个规则进行检测
+	for _, rule := range applicableRules {
+		ruleFindings := re.scanWithRule(rule, lines, filePath, language)
+		findings = append(findings, ruleFindings...)
+	}
+
+	// 记录扫描时间
+	scanTime := time.Since(startTime)
+	fmt.Printf("🔍 Scanned %s with %d rules in %v, found %d issues\n", 
+		filePath, len(applicableRules), scanTime, len(findings))
+
+	return findings, nil
+}
+
+// scanWithRule 使用单个规则扫描代码
+func (re *RuleEngine) scanWithRule(rule VulnerabilityRule, lines []string, filePath, language string) []Finding {
+	var findings []Finding
+
+	// 检查每个模式
+	for _, pattern := range rule.Patterns {
+		// 如果模式指定了语言，检查是否匹配
+		if len(pattern.Language) > 0 && !contains(pattern.Language, language) {
+			continue
+		}
+
+		// 编译正则表达式
+		regex, err := regexp.Compile(pattern.Pattern)
+		if err != nil {
+			fmt.Printf("⚠️ Invalid regex pattern in rule %s: %s\n", rule.ID, pattern.Pattern)
+			continue
+		}
+
+		// 在每行中查找匹配
+		for lineNum, line := range lines {
+			if matches := regex.FindAllStringIndex(line, -1); matches != nil {
+				for _, match := range matches {
+					// 检查是否有安全模式排除这个匹配
+					if re.isSafePattern(rule, line, language) {
+						continue
+					}
+
+					severity := pattern.Severity
+					if severity == "" {
+						severity = rule.Severity
+					}
+
+					finding := Finding{
+						RuleID:   rule.ID,
+						RuleName: rule.Name,
+						Category: rule.Category,
+						Severity: severity,
+						Message:  pattern.Message,
+						FilePath: filePath,
+						Line:     lineNum + 1,
+						Column:   match[0] + 1,
+						Code:     strings.TrimSpace(line),
+						Language: language,
+						Metadata: map[string]interface{}{
+							"pattern":     pattern.Pattern,
+							"match_start": match[0],
+							"match_end":   match[1],
+						},
+					}
+
+					findings = append(findings, finding)
+				}
+			}
+		}
+	}
+
+	return findings
+}
+
+// isSafePattern 检查是否匹配安全模式
+func (re *RuleEngine) isSafePattern(rule VulnerabilityRule, line, language string) bool {
+	for _, safePattern := range rule.SafePatterns {
+		// 如果安全模式指定了语言，检查是否匹配
+		if len(safePattern.Language) > 0 && !contains(safePattern.Language, language) {
+			continue
+		}
+
+		regex, err := regexp.Compile(safePattern.Pattern)
+		if err != nil {
+			continue
+		}
+
+		if regex.MatchString(line) {
+			return true
+		}
+	}
+	return false
+}
+
+// GetRules 获取所有规则
+func (re *RuleEngine) GetRules() []VulnerabilityRule {
+	return re.rules
+}
+
+// GetRulesByLanguage 获取特定语言的规则
+func (re *RuleEngine) GetRulesByLanguage(language string) []VulnerabilityRule {
+	return re.rulesByLang[language]
+}
+
+// GetRuleByID 根据ID获取规则
+func (re *RuleEngine) GetRuleByID(id string) *VulnerabilityRule {
+	for _, rule := range re.rules {
+		if rule.ID == id {
+			return &rule
+		}
+	}
+	return nil
+}
+
+// ExportFindings 导出检测结果为JSON
+func (re *RuleEngine) ExportFindings(findings []Finding) ([]byte, error) {
+	return json.MarshalIndent(findings, "", "  ")
+}
+
+// GetStatistics 获取扫描统计信息
+func (re *RuleEngine) GetStatistics(findings []Finding) map[string]interface{} {
+	stats := map[string]interface{}{
+		"total_findings": len(findings),
+		"by_severity":    make(map[string]int),
+		"by_category":    make(map[string]int),
+		"by_rule":        make(map[string]int),
+	}
+
+	severityCount := make(map[string]int)
+	categoryCount := make(map[string]int)
+	ruleCount := make(map[string]int)
+
+	for _, finding := range findings {
+		severityCount[finding.Severity]++
+		categoryCount[finding.Category]++
+		ruleCount[finding.RuleID]++
+	}
+
+	stats["by_severity"] = severityCount
+	stats["by_category"] = categoryCount
+	stats["by_rule"] = ruleCount
+
+	return stats
+}
+
+// contains 检查字符串切片是否包含指定字符串
+func contains(slice []string, item string) bool {
+	for _, s := range slice {
+		if s == item {
+			return true
+		}
+	}
+	return false
+}

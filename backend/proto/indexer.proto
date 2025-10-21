@@ -1,0 +1,157 @@
+syntax = "proto3";
+
+package codeaudit;
+
+option go_package = "./proto";
+option java_package = "com.codeaudit.proto";
+
+// 代码索引服务
+service Indexer {
+  // 构建索引
+  rpc BuildIndex(BuildIndexRequest) returns (BuildIndexResponse);
+  
+  // 查询函数
+  rpc QueryFunction(QueryFunctionRequest) returns (QueryFunctionResponse);
+  
+  // 查询类
+  rpc QueryClass(QueryClassRequest) returns (QueryClassResponse);
+  
+  // 查询调用者
+  rpc QueryCallers(QueryCallersRequest) returns (QueryCallersResponse);
+  
+  // 查询被调用者
+  rpc QueryCallees(QueryCalleesRequest) returns (QueryCalleesResponse);
+  
+  // 搜索符号
+  rpc SearchSymbol(SearchSymbolRequest) returns (stream SearchSymbolResponse);
+}
+
+// 构建索引请求
+message BuildIndexRequest {
+  string file_path = 1;           // 文件路径
+  bytes ast_data = 2;             // AST数据
+  string language = 3;             // 编程语言
+  bool incremental = 4;           // 是否增量索引
+}
+
+// 构建索引响应
+message BuildIndexResponse {
+  bool success = 1;               // 是否成功
+  string index_id = 2;            // 索引ID
+  int32 functions_indexed = 3;    // 索引的函数数
+  int32 classes_indexed = 4;      // 索引的类数
+  int32 variables_indexed = 5;    // 索引的变量数
+  string error_message = 6;       // 错误信息
+}
+
+// 查询函数请求
+message QueryFunctionRequest {
+  string function_name = 1;       // 函数名称
+  string file_path = 2;           // 可选：文件路径限制
+  bool exact_match = 3;           // 是否精确匹配
+}
+
+// 函数信息
+message FunctionInfo {
+  string id = 1;                  // 函数ID
+  string name = 2;                // 函数名称
+  string file_path = 3;           // 文件路径
+  int32 start_line = 4;           // 起始行号
+  int32 end_line = 5;             // 结束行号
+  string signature = 6;           // 函数签名
+  int32 cyclomatic_complexity = 7; // 圈复杂度
+  repeated string parameters = 8; // 参数列表
+  string return_type = 9;         // 返回类型
+}
+
+// 查询函数响应
+message QueryFunctionResponse {
+  repeated FunctionInfo functions = 1; // 查询结果
+  int32 total_count = 2;          // 总数
+}
+
+// 查询类请求
+message QueryClassRequest {
+  string class_name = 1;          // 类名
+  string file_path = 2;           // 可选：文件路径限制
+  bool exact_match = 3;           // 是否精确匹配
+}
+
+// 类信息
+message ClassInfo {
+  string id = 1;                  // 类ID
+  string name = 2;                // 类名
+  string file_path = 3;           // 文件路径
+  int32 start_line = 4;           // 起始行号
+  int32 end_line = 5;             // 结束行号
+  string base_class = 6;          // 基类
+  repeated string interfaces = 7; // 实现的接口
+  repeated MethodInfo methods = 8; // 方法列表
+  repeated string fields = 9;     // 字段列表
+}
+
+// 方法信息
+message MethodInfo {
+  string id = 1;                  // 方法ID
+  string name = 2;                // 方法名
+  bool is_static = 3;             // 是否静态
+  bool is_private = 4;            // 是否私有
+  string return_type = 5;         // 返回类型
+}
+
+// 查询类响应
+message QueryClassResponse {
+  repeated ClassInfo classes = 1; // 查询结果
+  int32 total_count = 2;          // 总数
+}
+
+// 查询调用者请求
+message QueryCallersRequest {
+  string function_id = 1;         // 目标函数ID
+  int32 max_depth = 2;            // 最大深度
+}
+
+// 查询调用者响应
+message QueryCallersResponse {
+  repeated CallInfo callers = 1;  // 调用者列表
+  int32 total_count = 2;          // 总数
+}
+
+// 调用信息
+message CallInfo {
+  string caller_id = 1;           // 调用者ID
+  string caller_name = 2;         // 调用者名称
+  string callee_id = 3;           // 被调用者ID
+  string callee_name = 4;         // 被调用者名称
+  int32 call_line = 5;            // 调用行号
+  string call_type = 6;           // 调用类型（direct, indirect）
+}
+
+// 查询被调用者请求
+message QueryCalleesRequest {
+  string function_id = 1;         // 源函数ID
+  int32 max_depth = 2;            // 最大深度
+}
+
+// 查询被调用者响应
+message QueryCalleesResponse {
+  repeated CallInfo callees = 1;  // 被调用者列表
+  int32 total_count = 2;          // 总数
+}
+
+// 搜索符号请求
+message SearchSymbolRequest {
+  string pattern = 1;             // 搜索模式（支持正则表达式）
+  string symbol_type = 2;         // 符号类型（function, class, variable）
+  int32 max_results = 3;          // 最多返回数
+}
+
+// 搜索符号响应
+message SearchSymbolResponse {
+  string symbol_id = 1;           // 符号ID
+  string symbol_name = 2;         // 符号名
+  string symbol_type = 3;         // 符号类型
+  string file_path = 4;           // 文件路径
+  int32 line_number = 5;          // 行号
+  double relevance_score = 6;     // 相关度得分
+}
