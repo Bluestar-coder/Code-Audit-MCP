@@ -245,6 +245,9 @@ const CodeAnalysis: React.FC = () => {
                 <MenuItem value="python">Python</MenuItem>
                 <MenuItem value="javascript">JavaScript</MenuItem>
                 <MenuItem value="typescript">TypeScript</MenuItem>
+                <MenuItem value="php">PHP</MenuItem>
+                <MenuItem value="ruby">Ruby</MenuItem>
+                <MenuItem value="csharp">C#</MenuItem>
               </Select>
             </FormControl>
           </Grid>

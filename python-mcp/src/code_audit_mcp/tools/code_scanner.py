@@ -13,6 +13,10 @@ LANG_EXT = {
     ".ts": "typescript",
     ".tsx": "typescript",
     ".py": "python",
+    ".java": "java",
+    ".php": "php",
+    ".rb": "ruby",
+    ".cs": "csharp",
 }
 
 

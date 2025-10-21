@@ -73,7 +73,7 @@ func (re *RuleEngine) LoadBuiltinRules() error {
 		Category:    "injection",
 		Severity:    "high",
 		Description: "Detects potential SQL injection vulnerabilities",
-		Language:    []string{"javascript", "typescript", "python", "go"},
+		Language:    []string{"javascript", "typescript", "python", "go", "java", "csharp", "php", "ruby"},
 		Patterns: []Pattern{
 			{
 				Pattern:  `["\'].*\+.*["\']`,
@@ -90,11 +90,64 @@ func (re *RuleEngine) LoadBuiltinRules() error {
 				Message:  "Potential SQL injection: string formatting in SQL query",
 				Severity: "high",
 			},
+			// PHP: 使用 '.' 拼接的查询
+			{
+				Pattern:  `(?i)(mysql_query|mysqli_query|pg_query|query)\s*\(\s*.*\.\s*.*\)`,
+				Message:  "Potential SQL injection: string concatenation with '.' (PHP)",
+				Severity: "high",
+				Language: []string{"php"},
+			},
+			// Java: Statement/PreparedStatement 拼接
+			{
+				Pattern:  `(?i)(createQuery|prepareStatement|Statement\.execute(?:Query|Update)?)\s*\(\s*.*\+.*\)`,
+				Message:  "Potential SQL injection: Java SQL API with concatenated query",
+				Severity: "high",
+				Language: []string{"java"},
+			},
+			// C#: SqlCommand 拼接
+			{
+				Pattern:  `SqlCommand\s*\(\s*.*\+.*\)`,
+				Message:  "Potential SQL injection: SqlCommand with string concatenation",
+				Severity: "high",
+				Language: []string{"csharp"},
+			},
+			// Ruby: 字符串插值
+			{
+				Pattern:  `\b(where|find_by_sql|execute)\s*\(\s*["\'].*#\{.*\}.*["\']\s*\)`,
+				Message:  "Potential SQL injection: Ruby string interpolation in SQL",
+				Severity: "high",
+				Language: []string{"ruby"},
+			},
+			// 通用: .format 构造查询
+			{
+				Pattern:  `\.format\s*\(.*\)`,
+				Message:  "Potential SQL injection: string.format used to build query",
+				Severity: "high",
+				Language: []string{"python", "java", "csharp"},
+			},
 		},
 		SafePatterns: []Pattern{
 			{
 				Pattern: `(?i)(prepare|prepared|parameterized)`,
 				Message: "Safe: using prepared statements",
+			},
+			// Java: PreparedStatement 占位符
+			{
+				Pattern: `prepareStatement\s*\(\s*.*\?`,
+				Message: "Safe: using PreparedStatement with placeholders",
+				Language: []string{"java"},
+			},
+			// PHP: PDO 预处理
+			{
+				Pattern: `->prepare\s*\(\s*.*\?`,
+				Message: "Safe: using PDO prepared statements",
+				Language: []string{"php"},
+			},
+			// C#: 参数化查询
+			{
+				Pattern: `Parameters\.AddWithValue|SqlParameter`,
+				Message: "Safe: using parameterized queries",
+				Language: []string{"csharp"},
 			},
 		},
 	}
@@ -106,7 +159,7 @@ func (re *RuleEngine) LoadBuiltinRules() error {
 		Category:    "injection",
 		Severity:    "medium",
 		Description: "Detects potential XSS vulnerabilities",
-		Language:    []string{"javascript", "typescript", "python"},
+		Language:    []string{"javascript", "typescript", "python", "php", "java", "csharp", "ruby"},
 		Patterns: []Pattern{
 			{
 				Pattern:  `innerHTML\s*=`,
@@ -123,11 +176,69 @@ func (re *RuleEngine) LoadBuiltinRules() error {
 				Message:  "Potential XSS: jQuery html() usage",
 				Severity: "medium",
 			},
+			// PHP: 直接输出超全局变量
+			{
+				Pattern:  `(?i)(echo|print)\s+.*\$_(GET|POST|REQUEST)`,
+				Message:  "Potential XSS: direct echo/print of user input",
+				Severity: "high",
+				Language: []string{"php"},
+			},
+			// Java: 响应输出
+			{
+				Pattern:  `response\.getWriter\(\)\.write\s*\(`,
+				Message:  "Potential XSS: writing raw data to response",
+				Severity: "medium",
+				Language: []string{"java"},
+			},
+			{
+				Pattern:  `out\.print(?:ln)?\s*\(`,
+				Message:  "Potential XSS: printing raw data to output",
+				Severity: "medium",
+				Language: []string{"java"},
+			},
+			// C#: Response.Write
+			{
+				Pattern:  `Response\.Write\s*\(`,
+				Message:  "Potential XSS: writing raw data to HTTP response",
+				Severity: "medium",
+				Language: []string{"csharp"},
+			},
+			// Ruby: inline 渲染插值
+			{
+				Pattern:  `render\s+inline:\s*["\'].*#\{.*\}.*["\']`,
+				Message:  "Potential XSS: inline render with unsanitized interpolation",
+				Severity: "medium",
+				Language: []string{"ruby"},
+			},
 		},
 		SafePatterns: []Pattern{
 			{
 				Pattern: `textContent|innerText`,
 				Message: "Safe: using textContent or innerText",
+			},
+			// PHP: htmlspecialchars
+			{
+				Pattern: `htmlspecialchars\s*\(`,
+				Message: "Safe: using htmlspecialchars",
+				Language: []string{"php"},
+			},
+			// Java: HTML 转义
+			{
+				Pattern: `StringEscapeUtils\.escapeHtml4\s*\(`,
+				Message: "Safe: using HTML escaping",
+				Language: []string{"java"},
+			},
+			// C#: HtmlEncode
+			{
+				Pattern: `HttpUtility\.HtmlEncode\s*\(`,
+				Message: "Safe: using HTML encoding",
+				Language: []string{"csharp"},
+			},
+			// Ruby: sanitize
+			{
+				Pattern: `sanitize\s*\(`,
+				Message: "Safe: using sanitize helper",
+				Language: []string{"ruby"},
 			},
 		},
 	}
@@ -139,15 +250,15 @@ func (re *RuleEngine) LoadBuiltinRules() error {
 		Category:    "path_traversal",
 		Severity:    "high",
 		Description: "Detects potential path traversal vulnerabilities",
-		Language:    []string{"javascript", "typescript", "python", "go"},
+		Language:    []string{"javascript", "typescript", "python", "go", "php", "java", "csharp", "ruby"},
 		Patterns: []Pattern{
 			{
-				Pattern:  `\.\.\/|\.\.\\`,
+				Pattern:  `\.\./|\.\.\\`,
 				Message:  "Potential path traversal: relative path detected",
 				Severity: "high",
 			},
 			{
-				Pattern:  `["'][^"']*["']\s*\+\s*\w+`,
+				Pattern:  `["\'][^"\']*["\']\s*\+\s*\w+`,
 				Message:  "Potential path traversal: string concatenation with user input",
 				Severity: "high",
 			},
@@ -156,16 +267,75 @@ func (re *RuleEngine) LoadBuiltinRules() error {
 				Message:  "Potential path traversal: file operation with concatenated path",
 				Severity: "high",
 			},
+			// PHP: 文件读写/包含
 			{
-				Pattern:  `["']\.\./.*["']`,
-				Message:  "Potential path traversal: relative path in string literal",
+				Pattern:  `(?i)file_(get|put)_contents\s*\(.*\$_(GET|POST|REQUEST).*`,
+				Message:  "Potential path traversal: file access with user input (PHP)",
+				Severity: "high",
+				Language: []string{"php"},
+			},
+			{
+				Pattern:  `(?i)(include|require|include_once|require_once)\s+.*\$_(GET|POST|REQUEST)`,
+				Message:  "Potential path traversal: dynamic include/require from user input",
+				Severity: "high",
+				Language: []string{"php"},
+			},
+			// Java: File/Paths 拼接
+			{
+				Pattern:  `new\s+File\s*\(\s*.*\+.*\)`,
+				Message:  "Potential path traversal: Java File constructed with concatenated path",
+				Severity: "high",
+				Language: []string{"java"},
+			},
+			{
+				Pattern:  `Paths\.get\s*\(\s*.*\+.*\)`,
+				Message:  "Potential path traversal: Java Paths.get with concatenated path",
 				Severity: "medium",
+				Language: []string{"java"},
+			},
+			// C#: File 操作拼接
+			{
+				Pattern:  `File\.(ReadAllText|AllBytes|WriteAllText|Open)\s*\(\s*.*\+.*\)`,
+				Message:  "Potential path traversal: C# file operation with concatenated path",
+				Severity: "high",
+				Language: []string{"csharp"},
+			},
+			// Ruby: File 操作拼接
+			{
+				Pattern:  `File\.(read|open)\s*\(\s*.*\+.*\)`,
+				Message:  "Potential path traversal: Ruby file operation with concatenated path",
+				Severity: "high",
+				Language: []string{"ruby"},
 			},
 		},
 		SafePatterns: []Pattern{
 			{
 				Pattern: `path\.resolve|os\.path\.abspath|filepath\.Clean`,
 				Message: "Safe: using path resolution functions",
+			},
+			// PHP: realpath
+			{
+				Pattern: `realpath\s*\(`,
+				Message: "Safe: using realpath to resolve absolute path",
+				Language: []string{"php"},
+			},
+			// Java: 规范化路径
+			{
+				Pattern: `Paths\.get\(.*\)\.normalize`,
+				Message: "Safe: normalizing path",
+				Language: []string{"java"},
+			},
+			// C#: 获取完整路径
+			{
+				Pattern: `System\.IO\.Path\.GetFullPath\s*\(`,
+				Message: "Safe: resolving full path",
+				Language: []string{"csharp"},
+			},
+			// Ruby: 绝对路径
+			{
+				Pattern: `File\.expand_path\s*\(`,
+				Message: "Safe: expanding path to absolute",
+				Language: []string{"ruby"},
 			},
 		},
 	}
