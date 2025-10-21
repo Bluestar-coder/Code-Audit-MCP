@@ -82,7 +82,7 @@ func main() {
 		pb.RegisterVulnerabilityDetectorServer(s, vulnerabilityService)
 		log.Println("  ✅ VulnerabilityDetectorServer registered")
 		// 并行启动 HTTP 网关
-		go startHTTPServer(vulnerabilityService, *httpPort)
+		go startHTTPServer(vulnerabilityService, *httpPort, *port)
 		log.Printf("🌐 HTTP API will listen on :%d\n", *httpPort)
 	}
 

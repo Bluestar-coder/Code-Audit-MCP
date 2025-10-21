@@ -56,6 +56,7 @@ import {
   CenterFocusStrong,
 } from '@mui/icons-material';
 import * as d3 from 'd3';
+import { queryTaintSources, queryTaintSinks, traceTaintPaths } from '../api/client';
 
 interface TaintPath {
   id: string;
@@ -346,29 +347,42 @@ const TaintAnalysis: React.FC = () => {
     setError(null);
     
     try {
-      // 尝试调用真实API
-      const request: TaintAnalysisRequest = {
-        source_patterns: [sourceFunction],
-        sink_patterns: [sinkFunction],
-        project_path: projectPath || undefined,
-        max_depth: maxDepth,
-        include_sanitizers: includeSanitizers,
-      };
+      const resp = await traceTaintPaths({
+        source_function: sourceFunction,
+        sink_function: sinkFunction,
+        max_paths: Math.max(1, maxDepth || 10),
+      });
 
-      // 模拟API调用
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const convertedPaths: TaintPath[] = (resp.paths || []).map((seg, idx) => {
+        const nodes = seg.nodes || [];
+        const pathSegments: PathSegment[] = nodes.map(n => ({
+          function: n.function_name,
+          file: n.file_path || 'unknown',
+          line: n.line_number || 0,
+          variable: n.variable_name || '',
+          operation: n.operation || '',
+          taint_type: n.data_flow || '',
+        }));
+        const sourceFn = nodes[0]?.function_name || sourceFunction;
+        const sinkFn = nodes[nodes.length - 1]?.function_name || sinkFunction;
+        return {
+          id: `${seg.path_index ?? idx}`,
+          source: sourceFn,
+          sink: sinkFn,
+          path: pathSegments,
+          riskLevel: seg.has_sanitizer ? 'low' : 'medium',
+          confidence: seg.has_sanitizer ? 0.6 : 0.8,
+          vulnerability_type: 'TaintFlow',
+          description: seg.has_sanitizer ? '路径包含净化处理' : '从源到汇的污点路径',
+        };
+      });
       
-      // 使用模拟数据
-      const filteredPaths = mockTaintPaths.filter(path => 
-        path.source.includes(sourceFunction) && path.sink.includes(sinkFunction)
-      );
-      
-      setTaintPaths(filteredPaths);
+      setTaintPaths(convertedPaths);
       setStatistics({
-        total_paths: filteredPaths.length,
-        high_risk_paths: filteredPaths.filter(p => p.riskLevel === 'high').length,
-        sources_found: mockSources.length,
-        sinks_found: mockSinks.length,
+        total_paths: convertedPaths.length,
+        high_risk_paths: convertedPaths.filter(p => p.riskLevel === 'high').length,
+        sources_found: sources.length,
+        sinks_found: sinks.length,
       });
       
     } catch (err) {
@@ -390,11 +404,17 @@ const TaintAnalysis: React.FC = () => {
 
   const handleQuerySources = async () => {
     try {
-      const filtered = mockSources.filter(s => 
-        !sourcePattern || s.name.toLowerCase().includes(sourcePattern.toLowerCase()) ||
-        s.category.toLowerCase().includes(sourcePattern.toLowerCase())
-      );
-      setSources(filtered);
+      const resp = await queryTaintSources(sourcePattern || '', '');
+      const mapped: SourceSink[] = (resp.sources || []).map(s => ({
+        name: s.name,
+        type: 'source',
+        file: 'unknown',
+        line: 0,
+        description: s.description || '',
+        category: s.type || 'Unknown',
+        risk_level: 'medium',
+      }));
+      setSources(mapped);
     } catch (err) {
       console.error('Failed to query sources:', err);
       setSources(mockSources);
@@ -403,11 +423,17 @@ const TaintAnalysis: React.FC = () => {
 
   const handleQuerySinks = async () => {
     try {
-      const filtered = mockSinks.filter(s => 
-        !sinkPattern || s.name.toLowerCase().includes(sinkPattern.toLowerCase()) ||
-        s.category.toLowerCase().includes(sinkPattern.toLowerCase())
-      );
-      setSinks(filtered);
+      const resp = await queryTaintSinks(sinkPattern || '', '');
+      const mapped: SourceSink[] = (resp.sinks || []).map(s => ({
+        name: s.name,
+        type: 'sink',
+        file: 'unknown',
+        line: 0,
+        description: s.description || '',
+        category: s.type || 'Unknown',
+        risk_level: 'medium',
+      }));
+      setSinks(mapped);
     } catch (err) {
       console.error('Failed to query sinks:', err);
       setSinks(mockSinks);

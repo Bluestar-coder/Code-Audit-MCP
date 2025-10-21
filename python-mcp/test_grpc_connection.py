@@ -7,19 +7,21 @@ import grpc
 import sys
 import os
 
-# 添加proto路径
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'proto'))
+# 添加项目根路径以导入 proto 包（优先使用本地 proto）
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+# 兼容生成代码中的顶层模块导入（indexer_pb2 / call_chain_pb2 等）
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'proto'))
 
 try:
-    # 导入生成的proto文件
-    import ast_parser_pb2
-    import ast_parser_pb2_grpc
-    import indexer_pb2
-    import indexer_pb2_grpc
-    import taint_analysis_pb2
-    import taint_analysis_pb2_grpc
-    import call_chain_pb2
-    import call_chain_pb2_grpc
+    # 导入生成的proto文件（作为 proto 包）
+    from proto import ast_parser_pb2
+    from proto import ast_parser_pb2_grpc
+    from proto import indexer_pb2
+    from proto import indexer_pb2_grpc
+    from proto import taint_analysis_pb2
+    from proto import taint_analysis_pb2_grpc
+    from proto import call_chain_pb2
+    from proto import call_chain_pb2_grpc
     
     print("✅ Proto文件导入成功")
 except ImportError as e:

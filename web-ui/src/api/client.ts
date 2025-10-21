@@ -138,3 +138,94 @@ export async function getScanHistory(limit: number = 10): Promise<ScanHistory[]>
   }
   return response.json();
 }
+
+// ===== 污点分析 API =====
+export interface SourceInfo {
+  id: string;
+  name: string;
+  type: string;
+  keywords: string[];
+  description: string;
+}
+
+export interface QuerySourcesResponse {
+  sources: SourceInfo[];
+  total_count: number;
+}
+
+export interface SinkInfo {
+  id: string;
+  name: string;
+  type: string;
+  keywords: string[];
+  vulnerability_type: string;
+  description: string;
+}
+
+export interface QuerySinksResponse {
+  sinks: SinkInfo[];
+  total_count: number;
+}
+
+export interface TracePathRequest {
+  source_function: string;
+  sink_function: string;
+  max_paths?: number;
+}
+
+export interface TracePathNode {
+  node_id: string;
+  function_name: string;
+  file_path: string;
+  line_number: number;
+  operation: string;
+  variable_name: string;
+  data_flow: string;
+}
+
+export interface TracePathSegment {
+  path_index: number;
+  nodes: TracePathNode[];
+  has_sanitizer: boolean;
+}
+
+export interface TracePathResponse {
+  paths: TracePathSegment[];
+}
+
+export async function queryTaintSources(pattern: string = '', language: string = ''): Promise<QuerySourcesResponse> {
+  const url = new URL(`${API_BASE}/taint/sources`);
+  if (pattern) url.searchParams.set('pattern', pattern);
+  if (language) url.searchParams.set('language', language);
+  const res = await fetch(url.toString());
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`HTTP ${res.status}: ${text}`);
+  }
+  return res.json();
+}
+
+export async function queryTaintSinks(pattern: string = '', language: string = ''): Promise<QuerySinksResponse> {
+  const url = new URL(`${API_BASE}/taint/sinks`);
+  if (pattern) url.searchParams.set('pattern', pattern);
+  if (language) url.searchParams.set('language', language);
+  const res = await fetch(url.toString());
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`HTTP ${res.status}: ${text}`);
+  }
+  return res.json();
+}
+
+export async function traceTaintPaths(req: TracePathRequest): Promise<TracePathResponse> {
+  const res = await fetch(`${API_BASE}/taint/trace`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(req),
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`HTTP ${res.status}: ${text}`);
+  }
+  return res.json();
+}

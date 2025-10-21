@@ -1,0 +1,1 @@
+# Make local proto directory a Python package for reliable imports
