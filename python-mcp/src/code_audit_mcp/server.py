@@ -23,7 +23,7 @@ async def list_tools() -> list[types.Tool]:
     return [
         types.Tool(
             name="scan_code",
-            description="Scan codebase for security vulnerabilities",
+            description="Build code index and collect symbols",
             inputSchema={
                 "type": "object",
                 "properties": {
@@ -137,6 +137,20 @@ async def list_tools() -> list[types.Tool]:
                 "required": ["package_name"],
             },
         ),
+        types.Tool(
+            name="scan_vulnerabilities",
+            description="Scan a file or content for vulnerabilities via Go service",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "file_path": {"type": "string", "description": "Path to file (optional)"},
+                    "language": {"type": "string", "description": "Programming language (optional)"},
+                    "content": {"type": "string", "description": "Raw code content (optional)"},
+                    "rule_ids": {"type": "array", "items": {"type": "string"}, "description": "Rule IDs to apply (optional)"}
+                },
+                "required": [],
+            },
+        ),
     ]
 
 
@@ -193,6 +207,16 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[types.TextCont
         ecosystem = arguments.get("ecosystem")
         async with VulnerabilitySearcher() as tool:
             result = await tool.execute(package_name=package, version=version, ecosystem=ecosystem)
+        return [types.TextContent(type="text", text=json.dumps(result, ensure_ascii=False, indent=2))]
+
+    elif name == "scan_vulnerabilities":
+        from .tools import VulnerabilityScanner
+        file_path = arguments.get("file_path")
+        language = arguments.get("language")
+        content = arguments.get("content")
+        rule_ids = arguments.get("rule_ids")
+        async with VulnerabilityScanner() as tool:
+            result = await tool.execute(file_path=file_path, language=language, content=content, rule_ids=rule_ids)
         return [types.TextContent(type="text", text=json.dumps(result, ensure_ascii=False, indent=2))]
 
     else:

@@ -60,6 +60,9 @@ MCP 服务器入口：`python -m code_audit_mcp.server`（适用于 MCP Host，�
 - `search_vulnerabilities`
   - 入参：`package_name`，`version?`，`ecosystem?`（如 `Go`/`PyPI`/`npm`）
   - 功能：调用 OSV API 返回已知漏洞，支持可选语义匹配
+- `scan_vulnerabilities`
+  - 入参：`file_path?`，`language?`，`content?`，`rule_ids?`
+  - 功能：通过 HTTP `/api/scan` 调用 Go 漏洞检测服务，返回扫描 `findings` 与统计
 
 ## 可选 AI 与语义检索
 - 设置环境变量以启用 AI

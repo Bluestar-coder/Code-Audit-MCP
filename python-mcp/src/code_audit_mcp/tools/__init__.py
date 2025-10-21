@@ -6,6 +6,7 @@ from .call_graph_analyzer import CallGraphAnalyzer
 from .taint_tracer import TaintTracer
 from .code_explainer import CodeExplainer
 from .vulnerability_searcher import VulnerabilitySearcher
+from .vulnerability_scanner import VulnerabilityScanner
 
 __all__ = [
     "CodeScanner",
@@ -14,4 +15,5 @@ __all__ = [
     "TaintTracer",
     "CodeExplainer",
     "VulnerabilitySearcher",
+    "VulnerabilityScanner",
 ]
