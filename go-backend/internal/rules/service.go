@@ -246,37 +246,43 @@ func (s *Service) GetRuleById(ctx context.Context, req *pb.GetRuleByIdRequest) (
 
 // detectLanguageFromPath 从文件路径检测编程语言
 func detectLanguageFromPath(filePath string) string {
-	ext := filepath.Ext(filePath)
-	switch ext {
-	case ".js":
-		return "javascript"
-	case ".ts":
-		return "typescript"
-	case ".py":
-		return "python"
-	case ".go":
-		return "go"
-	case ".java":
-		return "java"
-	case ".cpp", ".cc", ".cxx":
-		return "cpp"
-	case ".c":
-		return "c"
-	case ".cs":
-		return "csharp"
-	case ".php":
-		return "php"
-	case ".rb":
-		return "ruby"
-	case ".rs":
-		return "rust"
-	case ".swift":
-		return "swift"
-	case ".kt":
-		return "kotlin"
-	case ".scala":
-		return "scala"
-	default:
-		return "unknown"
-	}
+    ext := filepath.Ext(filePath)
+    switch ext {
+    case ".js":
+        return "javascript"
+    case ".mjs", ".cjs":
+        return "nodejs"
+    case ".ejs":
+        return "nodejs"
+    case ".ts":
+        return "typescript"
+    case ".py":
+        return "python"
+    case ".go":
+        return "go"
+    case ".java":
+        return "java"
+    case ".xml":
+        return "java"
+    case ".cpp", ".cc", ".cxx":
+        return "cpp"
+    case ".c":
+        return "c"
+    case ".cs":
+        return "csharp"
+    case ".php":
+        return "php"
+    case ".rb":
+        return "ruby"
+    case ".rs":
+        return "rust"
+    case ".swift":
+        return "swift"
+    case ".kt":
+        return "kotlin"
+    case ".scala":
+        return "scala"
+    default:
+        return "unknown"
+    }
 }

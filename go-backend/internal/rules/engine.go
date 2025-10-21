@@ -73,7 +73,7 @@ func (re *RuleEngine) LoadBuiltinRules() error {
 		Category:    "injection",
 		Severity:    "high",
 		Description: "Detects potential SQL injection vulnerabilities",
-		Language:    []string{"javascript", "typescript", "python", "go", "java", "csharp", "php", "ruby"},
+		Language:    []string{"javascript", "typescript", "python", "go", "java", "csharp", "php", "ruby", "nodejs", "rust"},
 		Patterns: []Pattern{
 			{
 				Pattern:  `["\'].*\+.*["\']`,
@@ -125,6 +125,55 @@ func (re *RuleEngine) LoadBuiltinRules() error {
 				Severity: "high",
 				Language: []string{"python", "java", "csharp"},
 			},
+			// Node.js: Express/ORM 查询拼接
+			{
+				Pattern:  `(?i)(mysql|pg|sequelize|knex)[\w\.]*\.(query|raw|execute)\s*\(\s*.*\+.*\)`,
+				Message:  "Potential SQL injection: Node.js DB query with concatenated SQL",
+				Severity: "high",
+				Language: []string{"nodejs"},
+			},
+			// Java: Spring JdbcTemplate 拼接
+			{
+				Pattern:  `JdbcTemplate\.(query|queryForList|update)\s*\(\s*.*\+.*\)`,
+				Message:  "Potential SQL injection: JdbcTemplate with concatenated SQL",
+				Severity: "high",
+				Language: []string{"java"},
+			},
+			// ruoyi/MyBatis 注解中使用 ${} 动态拼接
+			{
+				Pattern:  `@Select\s*\(\s*["'][^"']*\$\{[^}]+\}[^"']*["']\s*\)`,
+				Message:  "Potential SQL injection: MyBatis annotation with ${} (ruoyi)",
+				Severity: "high",
+				Language: []string{"java"},
+			},
+			// ruoyi/MyBatis XML 使用 ${} 动态拼接
+			{
+				Pattern:  `(?s)<select[^>]*>[^<]*\$\{[^}]+\}[^<]*</select>`,
+				Message:  "Potential SQL injection: MyBatis XML with ${} (ruoyi)",
+				Severity: "high",
+				Language: []string{"java"},
+			},
+			// Python: Django/Flask 原始执行 + 拼接
+			{
+				Pattern:  `(?i)cursor\.execute\s*\(\s*.*\+.*\)`,
+				Message:  "Potential SQL injection: Python cursor.execute with concatenation",
+				Severity: "high",
+				Language: []string{"python"},
+			},
+			// Python: 原始 SQL f-string
+			{
+				Pattern:  `(?i)raw\s*\(\s*["'][^"']*\{[^}]+\}[^"']*["']\s*\)`,
+				Message:  "Potential SQL injection: Python raw() with f-string interpolation",
+				Severity: "high",
+				Language: []string{"python"},
+			},
+			// PHP: ThinkPHP Db::query/execute 使用 '.' 拼接
+			{
+				Pattern:  `(?i)\b(Db|think\\Db)::(query|execute)\s*\(\s*.*\.\s*.*\)`,
+				Message:  "Potential SQL injection: ThinkPHP Db query with '.' concatenation",
+				Severity: "high",
+				Language: []string{"php"},
+			},
 		},
 		SafePatterns: []Pattern{
 			{
@@ -159,7 +208,7 @@ func (re *RuleEngine) LoadBuiltinRules() error {
 		Category:    "injection",
 		Severity:    "medium",
 		Description: "Detects potential XSS vulnerabilities",
-		Language:    []string{"javascript", "typescript", "python", "php", "java", "csharp", "ruby"},
+		Language:    []string{"javascript", "typescript", "python", "php", "java", "csharp", "ruby", "nodejs", "rust"},
 		Patterns: []Pattern{
 			{
 				Pattern:  `innerHTML\s*=`,
@@ -205,10 +254,59 @@ func (re *RuleEngine) LoadBuiltinRules() error {
 			},
 			// Ruby: inline 渲染插值
 			{
-				Pattern:  `render\s+inline:\s*["\'].*#\{.*\}.*["\']`,
+				Pattern:  `render\s+inline:\s*["'].*#\{.*\}.*["']`,
 				Message:  "Potential XSS: inline render with unsanitized interpolation",
 				Severity: "medium",
 				Language: []string{"ruby"},
+			},
+			// Node.js: 直接向响应输出原始内容
+			{
+				Pattern:  `(?i)res\.(send|render|write|end)\s*\(`,
+				Message:  "Potential XSS: sending raw data in Node.js response",
+				Severity: "medium",
+				Language: []string{"nodejs"},
+			},
+			// Rust: Web 框架返回原始 HTML
+			{
+				Pattern:  `(?i)(warp::reply::html|axum::response::Html|rocket::response::content::Html)\s*\(`,
+				Message:  "Potential XSS: returning raw HTML in Rust web response",
+				Severity: "medium",
+				Language: []string{"rust"},
+			},
+			// EJS: 非转义输出
+			{
+				Pattern:  `<%-\s*.*\s*%>`,
+				Message:  "Potential XSS: EJS unescaped output <%- %>",
+				Severity: "high",
+				Language: []string{"nodejs"},
+			},
+			// Django: mark_safe
+			{
+				Pattern:  `(?i)mark_safe\s*\(`,
+				Message:  "Potential XSS: Django mark_safe used",
+				Severity: "medium",
+				Language: []string{"python"},
+			},
+			// Django: HttpResponse 原始内容
+			{
+				Pattern:  `(?i)HttpResponse\s*\(`,
+				Message:  "Potential XSS: returning raw data in Django HttpResponse",
+				Severity: "medium",
+				Language: []string{"python"},
+			},
+			// Flask/Markupsafe: Markup 标记为安全
+			{
+				Pattern:  `(?i)Markup\s*\(`,
+				Message:  "Potential XSS: Markup used to mark string as safe",
+				Severity: "medium",
+				Language: []string{"python"},
+			},
+			// Rust/Askama: Markup 非转义
+			{
+				Pattern:  `(?i)askama::Markup\s*\(`,
+				Message:  "Potential XSS: Askama Markup used to bypass escaping",
+				Severity: "medium",
+				Language: []string{"rust"},
 			},
 		},
 		SafePatterns: []Pattern{
@@ -240,6 +338,24 @@ func (re *RuleEngine) LoadBuiltinRules() error {
 				Message: "Safe: using sanitize helper",
 				Language: []string{"ruby"},
 			},
+			// Node.js: 使用常见的 HTML 清洗/转义库
+			{
+				Pattern: `sanitizeHtml\s*\(|xssFilters\.escapeHTML\s*\(|_\.escape\s*\(`,
+				Message: "Safe: using HTML sanitization/escaping in Node.js",
+				Language: []string{"nodejs"},
+			},
+			// Rust: 使用 HTML 转义或清洗库
+			{
+				Pattern: `html_escape::encode_text\s*\(|htmlescape::encode_minimal\s*\(|ammonia::clean\s*\(`,
+				Message: "Safe: using HTML escaping/sanitization in Rust",
+				Language: []string{"rust"},
+			},
+			// Django/Flask: escape
+			{
+				Pattern: `(?i)(django\.utils\.html\.escape|flask\.escape|markupsafe\.escape)\s*\(`,
+				Message: "Safe: escaping HTML in Python frameworks",
+				Language: []string{"python"},
+			},
 		},
 	}
 
@@ -250,7 +366,7 @@ func (re *RuleEngine) LoadBuiltinRules() error {
 		Category:    "path_traversal",
 		Severity:    "high",
 		Description: "Detects potential path traversal vulnerabilities",
-		Language:    []string{"javascript", "typescript", "python", "go", "php", "java", "csharp", "ruby"},
+		Language:    []string{"javascript", "typescript", "python", "go", "php", "java", "csharp", "ruby", "nodejs", "rust"},
 		Patterns: []Pattern{
 			{
 				Pattern:  `\.\./|\.\.\\`,
@@ -266,6 +382,33 @@ func (re *RuleEngine) LoadBuiltinRules() error {
 				Pattern:  `(readFile|writeFile|open|readFileSync|writeFileSync|createReadStream|createWriteStream)\s*\(\s*.*\+`,
 				Message:  "Potential path traversal: file operation with concatenated path",
 				Severity: "high",
+			},
+			// Node.js: path.join 拼接用户输入
+			{
+				Pattern:  `path\.join\s*\(\s*.*\+.*\)`,
+				Message:  "Potential path traversal: path.join with concatenated path",
+				Severity: "high",
+				Language: []string{"nodejs"},
+			},
+			// Flask: 发送文件路径拼接
+			{
+				Pattern:  `(?i)send_file\s*\(\s*.*\+.*\)`,
+				Message:  "Potential path traversal: Flask send_file with concatenated path",
+				Severity: "high",
+				Language: []string{"python"},
+			},
+			{
+				Pattern:  `(?i)send_from_directory\s*\(\s*.*\+.*\)`,
+				Message:  "Potential path traversal: Flask send_from_directory with concatenated path",
+				Severity: "high",
+				Language: []string{"python"},
+			},
+			// Python: open 拼接用户输入
+			{
+				Pattern:  `open\s*\(\s*.*\+.*\)`,
+				Message:  "Potential path traversal: Python open with concatenated path",
+				Severity: "high",
+				Language: []string{"python"},
 			},
 			// PHP: 文件读写/包含
 			{

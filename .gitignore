@@ -30,3 +30,8 @@ go-backend/data/audit.db/callchain/KEYREGISTRY
 go-backend/data/audit.db/callchain/LOCK
 go-backend/data/audit.db/callchain/MANIFEST
 .gitignore
+go-backend/data/audit.db/00002.mem
+go-backend/data/audit.db/000002.vlog
+go-backend/data/audit.db/callchain/00002.mem
+go-backend/data/audit.db/callchain/000002.vlog
+go-backend/server.exe

@@ -248,6 +248,8 @@ const CodeAnalysis: React.FC = () => {
                 <MenuItem value="php">PHP</MenuItem>
                 <MenuItem value="ruby">Ruby</MenuItem>
                 <MenuItem value="csharp">C#</MenuItem>
+                <MenuItem value="nodejs">Node.js</MenuItem>
+                <MenuItem value="rust">Rust</MenuItem>
               </Select>
             </FormControl>
           </Grid>

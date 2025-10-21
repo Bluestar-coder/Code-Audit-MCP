@@ -14,9 +14,14 @@ LANG_EXT = {
     ".tsx": "typescript",
     ".py": "python",
     ".java": "java",
+    ".xml": "java",
     ".php": "php",
     ".rb": "ruby",
     ".cs": "csharp",
+    ".mjs": "nodejs",
+    ".cjs": "nodejs",
+    ".ejs": "nodejs",
+    ".rs": "rust",
 }
 
 
