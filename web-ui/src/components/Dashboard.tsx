@@ -23,23 +23,21 @@ import {
   IconButton,
   Tooltip,
 } from '@mui/material';
-import {
-  Security,
-  BugReport,
-  Warning,
-  CheckCircle,
-  Code,
-  Timeline,
-  Refresh,
-  History,
-  Language,
-  Folder,
-  Schedule,
-  TrendingUp,
-  TrendingDown,
-} from '@mui/icons-material';
+import Security from '@mui/icons-material/Security';
+import BugReport from '@mui/icons-material/BugReport';
+import Warning from '@mui/icons-material/Warning';
+import CheckCircle from '@mui/icons-material/CheckCircle';
+import Code from '@mui/icons-material/Code';
+import Timeline from '@mui/icons-material/Timeline';
+import Refresh from '@mui/icons-material/Refresh';
+import History from '@mui/icons-material/History';
+import Language from '@mui/icons-material/Language';
+import Folder from '@mui/icons-material/Folder';
+import Schedule from '@mui/icons-material/Schedule';
+import TrendingUp from '@mui/icons-material/TrendingUp';
+import TrendingDown from '@mui/icons-material/TrendingDown';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts';
-import { getDashboardData, getProjectStats, getVulnerabilityStats, getScanHistory, type DashboardData, type ProjectStats, type VulnerabilityStats, type ScanHistory } from '../api/client';
+import { getDashboardData, getProjectStats, getVulnerabilityStats, getScanHistory, type DashboardData } from '../api/client';
 
 const Dashboard: React.FC = () => {
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);

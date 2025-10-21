@@ -31,17 +31,15 @@ import {
   TableHead,
   TableRow,
 } from '@mui/material';
-import {
-  PlayArrow,
-  ExpandMore,
-  Code,
-  BugReport,
-  Security,
-  Speed,
-  Folder,
-  Description,
-} from '@mui/icons-material';
-import { scanFile, ScanFileRequest } from '../api/client';
+import PlayArrow from '@mui/icons-material/PlayArrow';
+import ExpandMore from '@mui/icons-material/ExpandMore';
+import Code from '@mui/icons-material/Code';
+import BugReport from '@mui/icons-material/BugReport';
+import Security from '@mui/icons-material/Security';
+import Speed from '@mui/icons-material/Speed';
+import Folder from '@mui/icons-material/Folder';
+import Description from '@mui/icons-material/Description';
+import { scanFile } from '../api/client';
 
 interface AnalysisResult {
   id: string;

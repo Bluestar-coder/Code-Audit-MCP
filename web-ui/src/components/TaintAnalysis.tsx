@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Grid from '@mui/material/Grid';
 import {
   Box,
@@ -21,11 +21,7 @@ import {
   Card,
   CardContent,
   CardActions,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Tab,
+   Tab,
   Tabs,
   FormControl,
   InputLabel,
@@ -35,26 +31,24 @@ import {
   FormControlLabel,
   LinearProgress,
 } from '@mui/material';
-import {
-  PlayArrow,
-  ExpandMore,
-  Timeline,
-  Source,
-  CallSplit,
-  Info,
-  Refresh,
-  Visibility,
-  Download,
-  Settings,
-  AccountTree,
-  TrendingUp,
-  Security,
-  BugReport,
-  FilterList,
-  ZoomIn,
-  ZoomOut,
-  CenterFocusStrong,
-} from '@mui/icons-material';
+import PlayArrow from '@mui/icons-material/PlayArrow';
+import ExpandMore from '@mui/icons-material/ExpandMore';
+import Timeline from '@mui/icons-material/Timeline';
+import Source from '@mui/icons-material/Source';
+import CallSplit from '@mui/icons-material/CallSplit';
+import Info from '@mui/icons-material/Info';
+import Refresh from '@mui/icons-material/Refresh';
+import Visibility from '@mui/icons-material/Visibility';
+import Download from '@mui/icons-material/Download';
+import Settings from '@mui/icons-material/Settings';
+import AccountTree from '@mui/icons-material/AccountTree';
+
+import Security from '@mui/icons-material/Security';
+import BugReport from '@mui/icons-material/BugReport';
+import FilterList from '@mui/icons-material/FilterList';
+import ZoomIn from '@mui/icons-material/ZoomIn';
+import ZoomOut from '@mui/icons-material/ZoomOut';
+import CenterFocusStrong from '@mui/icons-material/CenterFocusStrong';
 import * as d3 from 'd3';
 import { queryTaintSources, queryTaintSinks, traceTaintPaths } from '../api/client';
 
@@ -104,27 +98,86 @@ interface TaintFlowEdge {
   type: string;
 }
 
-interface TaintAnalysisRequest {
-  source_patterns?: string[];
-  sink_patterns?: string[];
-  project_path?: string;
-  max_depth?: number;
-  include_sanitizers?: boolean;
-}
 
-interface TaintAnalysisResponse {
-  success: boolean;
-  message?: string;
-  paths: TaintPath[];
-  sources: SourceSink[];
-  sinks: SourceSink[];
-  statistics: {
-    total_paths: number;
-    high_risk_paths: number;
-    sources_found: number;
-    sinks_found: number;
-  };
-}
+
+// 模拟数据（模块级常量，避免 Hook 依赖警告）
+const mockSources: SourceSink[] = [
+  {
+    name: 'http.Request.FormValue',
+    type: 'source',
+    file: 'src/handlers/user.go',
+    line: 25,
+    description: 'HTTP表单输入，用户可控数据源',
+    category: 'HTTP Input',
+    risk_level: 'high',
+  },
+  {
+    name: 'http.Request.URL.Query',
+    type: 'source',
+    file: 'src/handlers/search.go',
+    line: 42,
+    description: 'URL查询参数，用户可控数据源',
+    category: 'HTTP Input',
+    risk_level: 'high',
+  },
+  {
+    name: 'json.Unmarshal',
+    type: 'source',
+    file: 'src/api/handler.go',
+    line: 78,
+    description: 'JSON反序列化，外部数据源',
+    category: 'Deserialization',
+    risk_level: 'medium',
+  },
+  {
+    name: 'os.Getenv',
+    type: 'source',
+    file: 'src/config/env.go',
+    line: 15,
+    description: '环境变量读取',
+    category: 'Environment',
+    risk_level: 'low',
+  },
+];
+
+const mockSinks: SourceSink[] = [
+  {
+    name: 'database.Query',
+    type: 'sink',
+    file: 'src/database/user.go',
+    line: 156,
+    description: 'SQL查询执行，潜在SQL注入点',
+    category: 'Database',
+    risk_level: 'high',
+  },
+  {
+    name: 'os.Exec',
+    type: 'sink',
+    file: 'src/utils/system.go',
+    line: 89,
+    description: '系统命令执行，潜在命令注入点',
+    category: 'Command Execution',
+    risk_level: 'high',
+  },
+  {
+    name: 'template.Execute',
+    type: 'sink',
+    file: 'src/views/render.go',
+    line: 34,
+    description: '模板渲染，潜在XSS注入点',
+    category: 'Template',
+    risk_level: 'medium',
+  },
+  {
+    name: 'log.Printf',
+    type: 'sink',
+    file: 'src/utils/logger.go',
+    line: 67,
+    description: '日志输出，信息泄露风险',
+    category: 'Logging',
+    risk_level: 'low',
+  },
+];
 
 const TaintAnalysis: React.FC = () => {
   const [sourceFunction, setSourceFunction] = useState('');
@@ -136,7 +189,6 @@ const TaintAnalysis: React.FC = () => {
   const [sourcePattern, setSourcePattern] = useState('');
   const [sinkPattern, setSinkPattern] = useState('');
   const [selectedPath, setSelectedPath] = useState<TaintPath | null>(null);
-  const [dialogOpen, setDialogOpen] = useState(false);
   const [tabValue, setTabValue] = useState(0);
   const [projectPath, setProjectPath] = useState('');
   const [maxDepth, setMaxDepth] = useState(10);
@@ -151,86 +203,9 @@ const TaintAnalysis: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   
   const svgRef = useRef<SVGSVGElement>(null);
-  const [flowData, setFlowData] = useState<{ nodes: TaintFlowNode[], edges: TaintFlowEdge[] }>({ nodes: [], edges: [] });
+  const [, setFlowData] = useState<{ nodes: TaintFlowNode[], edges: TaintFlowEdge[] }>({ nodes: [], edges: [] });
 
-  // 模拟数据
-  const mockSources: SourceSink[] = [
-    {
-      name: 'http.Request.FormValue',
-      type: 'source',
-      file: 'src/handlers/user.go',
-      line: 25,
-      description: 'HTTP表单输入，用户可控数据源',
-      category: 'HTTP Input',
-      risk_level: 'high',
-    },
-    {
-      name: 'http.Request.URL.Query',
-      type: 'source',
-      file: 'src/handlers/search.go',
-      line: 42,
-      description: 'URL查询参数，用户可控数据源',
-      category: 'HTTP Input',
-      risk_level: 'high',
-    },
-    {
-      name: 'json.Unmarshal',
-      type: 'source',
-      file: 'src/api/handler.go',
-      line: 78,
-      description: 'JSON反序列化，外部数据源',
-      category: 'Deserialization',
-      risk_level: 'medium',
-    },
-    {
-      name: 'os.Getenv',
-      type: 'source',
-      file: 'src/config/env.go',
-      line: 15,
-      description: '环境变量读取',
-      category: 'Environment',
-      risk_level: 'low',
-    },
-  ];
-
-  const mockSinks: SourceSink[] = [
-    {
-      name: 'database.Query',
-      type: 'sink',
-      file: 'src/database/user.go',
-      line: 156,
-      description: 'SQL查询执行，潜在SQL注入点',
-      category: 'Database',
-      risk_level: 'high',
-    },
-    {
-      name: 'os.Exec',
-      type: 'sink',
-      file: 'src/utils/system.go',
-      line: 89,
-      description: '系统命令执行，潜在命令注入点',
-      category: 'Command Execution',
-      risk_level: 'high',
-    },
-    {
-      name: 'template.Execute',
-      type: 'sink',
-      file: 'src/views/render.go',
-      line: 34,
-      description: '模板渲染，潜在XSS注入点',
-      category: 'Template',
-      risk_level: 'medium',
-    },
-    {
-      name: 'log.Printf',
-      type: 'sink',
-      file: 'src/utils/logger.go',
-      line: 67,
-      description: '日志输出，信息泄露风险',
-      category: 'Logging',
-      risk_level: 'low',
-    },
-  ];
+  // 模拟数据（mockSources/mockSinks 已移至模块级）
 
   const mockTaintPaths: TaintPath[] = [
     {
@@ -324,18 +299,9 @@ const TaintAnalysis: React.FC = () => {
     },
   ];
 
-  useEffect(() => {
-    // 初始化时加载数据源和汇聚点
-    handleQuerySources();
-    handleQuerySinks();
-  }, []);
 
-  useEffect(() => {
-    // 当选择路径时，生成数据流图
-    if (selectedPath) {
-      generateFlowDiagram(selectedPath);
-    }
-  }, [selectedPath]);
+
+
 
   const handleTracePath = async () => {
     if (!sourceFunction || !sinkFunction) {
@@ -402,7 +368,7 @@ const TaintAnalysis: React.FC = () => {
     }
   };
 
-  const handleQuerySources = async () => {
+  const handleQuerySources = useCallback(async () => {
     try {
       const resp = await queryTaintSources(sourcePattern || '', '');
       const mapped: SourceSink[] = (resp.sources || []).map(s => ({
@@ -419,9 +385,9 @@ const TaintAnalysis: React.FC = () => {
       console.error('Failed to query sources:', err);
       setSources(mockSources);
     }
-  };
+  }, [sourcePattern]);
 
-  const handleQuerySinks = async () => {
+  const handleQuerySinks = useCallback(async () => {
     try {
       const resp = await queryTaintSinks(sinkPattern || '', '');
       const mapped: SourceSink[] = (resp.sinks || []).map(s => ({
@@ -438,43 +404,12 @@ const TaintAnalysis: React.FC = () => {
       console.error('Failed to query sinks:', err);
       setSinks(mockSinks);
     }
-  };
+  }, [sinkPattern]);
 
-  const generateFlowDiagram = (path: TaintPath) => {
-    const nodes: TaintFlowNode[] = [];
-    const edges: TaintFlowEdge[] = [];
 
-    // 创建节点
-    path.path.forEach((segment, index) => {
-      const nodeId = `node-${index}`;
-      const nodeType = index === 0 ? 'source' : 
-                      index === path.path.length - 1 ? 'sink' : 'intermediate';
-      
-      nodes.push({
-        id: nodeId,
-        label: segment.function,
-        type: nodeType,
-        file: segment.file,
-        line: segment.line,
-        risk: path.riskLevel,
-      });
 
-      // 创建边
-      if (index > 0) {
-        edges.push({
-          source: `node-${index - 1}`,
-          target: nodeId,
-          label: segment.operation,
-          type: segment.taint_type,
-        });
-      }
-    });
 
-    setFlowData({ nodes, edges });
-    renderFlowDiagram(nodes, edges);
-  };
-
-  const renderFlowDiagram = (nodes: TaintFlowNode[], edges: TaintFlowEdge[]) => {
+  const renderFlowDiagram = useCallback((nodes: TaintFlowNode[], edges: TaintFlowEdge[]) => {
     if (!svgRef.current) return;
 
     const svg = d3.select(svgRef.current);
@@ -588,7 +523,55 @@ const TaintAnalysis: React.FC = () => {
         .attr("x", (d: any) => (d.source.x + d.target.x) / 2)
         .attr("y", (d: any) => (d.source.y + d.target.y) / 2);
     });
-  };
+  }, []);
+
+  // 在渲染函数之后定义，避免 use-before-define
+  const generateFlowDiagram = useCallback((path: TaintPath) => {
+    const nodes: TaintFlowNode[] = [];
+    const edges: TaintFlowEdge[] = [];
+
+    // 创建节点
+    path.path.forEach((segment, index) => {
+      const nodeId = `node-${index}`;
+      const nodeType = index === 0 ? 'source' : 
+                      index === path.path.length - 1 ? 'sink' : 'intermediate';
+      
+      nodes.push({
+        id: nodeId,
+        label: segment.function,
+        type: nodeType,
+        file: segment.file,
+        line: segment.line,
+        risk: path.riskLevel,
+      });
+
+      // 创建边
+      if (index > 0) {
+        edges.push({
+          source: `node-${index - 1}`,
+          target: nodeId,
+          label: segment.operation,
+          type: segment.taint_type,
+        });
+      }
+    });
+
+    setFlowData({ nodes, edges });
+    renderFlowDiagram(nodes, edges);
+  }, [renderFlowDiagram]);
+
+  // 初始化时加载数据源和汇聚点（函数已在上方定义，避免 use-before-define）
+  useEffect(() => {
+    handleQuerySources();
+    handleQuerySinks();
+  }, [handleQuerySources, handleQuerySinks]);
+
+  // 当选择路径时，生成数据流图
+  useEffect(() => {
+    if (selectedPath) {
+      generateFlowDiagram(selectedPath);
+    }
+  }, [selectedPath, generateFlowDiagram]);
 
   const getRiskColor = (risk: string) => {
     switch (risk) {

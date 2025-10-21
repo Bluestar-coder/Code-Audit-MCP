@@ -12,12 +12,10 @@ import {
   createTheme,
   CssBaseline,
 } from '@mui/material';
-import {
-  Dashboard as DashboardIcon,
-  BugReport,
-  Timeline,
-  Code,
-} from '@mui/icons-material';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import BugReport from '@mui/icons-material/BugReport';
+import Timeline from '@mui/icons-material/Timeline';
+import Code from '@mui/icons-material/Code';
 
 // 导入组件
 import Dashboard from './components/Dashboard';
